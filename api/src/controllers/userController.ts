@@ -9,4 +9,10 @@ router.get("/", async (req, res) => {
     res.status(200).json(users);
 });
 
+router.post("/", async (req, res) => {
+    const id = await userService.create(req.body);
+
+    res.status(201).json({ id });
+});
+
 export default router;

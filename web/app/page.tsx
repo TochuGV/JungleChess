@@ -1,4 +1,5 @@
 import { getAllUsers } from "@/axios/userRequests"
+import Link from "next/link";
 
 export default async function Home() {
   const users = await getAllUsers();
@@ -9,11 +10,12 @@ export default async function Home() {
       <ul>
         {users.map(user => (
           <li key={user.id}>
-            <h2>{user.name}</h2>
+            <h2>{user.username}</h2>
             <p>{user.description}</p>
           </li>
         ))}
       </ul>
+      <Link href="/register" className="text-blue-500 underline">Register</Link>
     </div>
   )
 }
