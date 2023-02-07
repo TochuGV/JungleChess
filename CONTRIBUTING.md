@@ -8,7 +8,8 @@ These are the dependencies required to start working:
 
 - Git (Any version)
 - NodeJS (Latest version)
-- SQL Server (Any version)
+- Microsoft SQL Server (Any version)
+  - Create the server with SQL Server Authentication and set the user and password to anything, preferably to root and root
 
 ## Picking a ticket
 
@@ -19,13 +20,21 @@ The link for the **Trello Workspace** is in the [Official Jungle Chess Discord](
 ## Setting up
 
 - Clone the repository with `git clone https://github.com/TochuGV/JungleChess.git` in your terminal
+- Create **.env** file inside `/api` similar contents to the following example:
+```
+DB_USER=root
+DB_PASSWORD=root
+DB_SERVER=localhost
+DB_NAME=JungleChess
+```
 - In `Microsoft SQL Server Management Studio` run the script in /database/script.sql to initialize the database
 - Run `npm install` in `/api` and `/web` to install the required dependencies
 - To run the project, execute in a terminal `npm run dev` inside `/api` and in another terminal inside `/web` in that order
 
 ## Making changes
 
-- After choosing a ticket, create a branch based from `origin/main` named with the following syntax:
+- After choosing a ticket, always remember to pull the changes from the remote repository with `git pull` before making any changes and creating commits
+- Create a branch based from `origin/main` named with the following syntax:
   - TicketNumber_ShortNameForTicket
     - For example: 26_CreateGameTable
   - *In Visual Studio Code, click on Source Control > Views and More Actions... > Branch > Create Branch*
