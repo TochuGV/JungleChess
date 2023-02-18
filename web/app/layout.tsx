@@ -1,3 +1,5 @@
+import Footer from '@/components/layout/footer'
+import Script from 'next/script'
 import './globals.css'
 
 export default function RootLayout({
@@ -7,12 +9,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/*
-        <head /> will contain the components returned by the nearest parent
-        head.tsx. Find out more at https://beta.nextjs.org/docs/api-reference/file-conventions/head
-      */}
       <head />
-      <body>{children}</body>
+      <body className="bg-background-900 text-white">
+        {children}
+        <Footer />
+      </body>
+      <Script src="https://kit.fontawesome.com/16e46131e7.js" crossOrigin="anonymous"></Script>
     </html>
   )
 }
