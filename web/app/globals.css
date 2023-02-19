@@ -1,3 +1,27 @@
+@import url(https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic);
+
 @tailwind base;
+
+@layer base {
+  body {
+    font-family: "Poppins";
+  }
+}
+
 @tailwind components;
+
+@layer components {
+  footer hr {
+    @apply mx-auto w-3/4 mb-6 border-neutral-500;
+  }
+
+  footer div {
+    @apply flex flex-row justify-center items-center gap-4 pb-6;
+  }
+
+  footer p {
+    @apply text-neutral-300 font-medium;
+  }
+}
+
 @tailwind utilities;
