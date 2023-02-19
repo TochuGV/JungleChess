@@ -6,10 +6,10 @@ export default function Page() {
 
   return (
     <div className="w-full h-screen grid place-items-center">
-      <div className="board">
+      <div className="board w-[800px]">
         {board.map((row, x) => row.map((square, y) => (
           <div
-            className={`game-square game-square-${square}-${isSquareLight(x, y) ? "light" : "dark"}`}
+            className={`game-square w-full game-square-${square}-${isSquareLight(x, y) ? "light" : "dark"}`}
             data-number-after={x === 0 ? y + 1 : ""}
             data-number-before={y === 8 ? String.fromCharCode(x + 65) : ""}
           ></div>

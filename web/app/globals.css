@@ -12,11 +12,12 @@
 
 @layer components {
   .board {
-    @apply grid grid-cols-9 w-fit rotate-90 -scale-y-100;
+    @apply grid grid-cols-9 rotate-90 -scale-y-100;
+    aspect-ratio: 9 / 7;
   }
 
   .game-square {
-    @apply w-[64px] h-[64px] rotate-90 -scale-y-100;
+    @apply rotate-90 -scale-y-100;
   }
 
   .game-square::after {
