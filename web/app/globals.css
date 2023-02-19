@@ -22,10 +22,6 @@
   footer p {
     @apply text-neutral-300 font-medium;
   }
-
-  .discord-icon {
-    @apply text-[#5865F2] text-2xl;
-  }
 }
 
 @tailwind utilities;
