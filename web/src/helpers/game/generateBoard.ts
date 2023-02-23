@@ -1,6 +1,6 @@
 import { GameObject } from "@/interfaces/game";
 
-export default function generateBoard() {
+export default function createGame() {
   const board: GameObject[][] = [];
 
   for (let i = 0; i < 7; i++) {

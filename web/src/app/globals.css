@@ -16,12 +16,16 @@
   }
 
   .board {
-    @apply grid grid-cols-9 rotate-90 -scale-y-100 gap-0 gap-x-0 gap-y-0 text-sm md:text-base;
-    aspect-ratio: 9 / 7;
+    @apply grid grid-cols-7 relative gap-0 gap-x-0 gap-y-0 text-sm md:text-base;
+    aspect-ratio: 7 / 9;
   }
 
   .game-square {
-    @apply rotate-90 -scale-y-100 grid place-items-center;
+    @apply grid place-items-center relative;
+  }
+
+  .game-piece {
+    @apply absolute grid place-items-center;
   }
 
   .game-square::after {

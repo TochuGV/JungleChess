@@ -23,6 +23,7 @@ export interface PieceData {
 	name: Piece;
 	position: [number, number];
 	team: Turn;
+	id: number;
 }
 
 export enum MoveDirection {
