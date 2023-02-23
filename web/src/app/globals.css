@@ -11,56 +11,37 @@
 @tailwind components;
 
 @layer components {
+  .board-container {
+    @apply w-full h-screen grid place-items-center;
+  }
+
   .board {
-    @apply grid grid-cols-9 rotate-90 -scale-y-100;
+    @apply grid grid-cols-9 rotate-90 -scale-y-100 gap-0 gap-x-0 gap-y-0 text-sm md:text-base;
     aspect-ratio: 9 / 7;
   }
 
   .game-square {
-    @apply rotate-90 -scale-y-100;
+    @apply rotate-90 -scale-y-100 grid place-items-center;
   }
 
   .game-square::after {
-    @apply absolute left-1 top-0;
+    @apply absolute left-1 top-0 z-10;
     content: attr(data-number-after);
   }
 
   .game-square::before {
-    @apply absolute right-1 bottom-0;
+    @apply absolute right-1 bottom-0 z-10;
     content: attr(data-number-before);
   }
 
-  .game-square-L-light {
-    @apply bg-primary-500;
-  }
-
-  .game-square-L-dark {
-    @apply bg-primary-700;
-  }
-
-  .game-square-W-light {
-    @apply bg-secondary-500;
-  }
-
-  .game-square-W-dark {
-    @apply bg-secondary-700;
-  }
-
-  .game-square-T-light {
-    @apply bg-warning-500;
-  }
-  
-  .game-square-T-dark {
-    @apply bg-warning-700;
-  }
-  
-  .game-square-E-light {
-    @apply bg-error-500;
-  }
-
-  .game-square-E-dark {
-    @apply bg-error-700;
-  }
+  .game-square-L-light { @apply bg-primary-500; }
+  .game-square-L-dark { @apply bg-primary-700; }
+  .game-square-W-light { @apply bg-secondary-500; }
+  .game-square-W-dark { @apply bg-secondary-700; }
+  .game-square-T-light { @apply bg-primary-500; }
+  .game-square-T-dark { @apply bg-primary-700; }
+  .game-square-E-light { @apply bg-primary-500; }
+  .game-square-E-dark { @apply bg-primary-700; }
 
   footer hr {
     @apply mx-auto w-3/4 mb-6 border-neutral-500;
