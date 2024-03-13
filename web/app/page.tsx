@@ -9,9 +9,9 @@ export default async function Home() {
       <h1 className='text-3xl underline font-bold'>Hello World!</h1>
       <ul>
         {users.map(user => (
-          <li key={user.id}>
-            <h2 className="text-lg text-primary-500 font-bold">{user.username}</h2>
-            <p className="text-secondary-500">{user.description}</p>
+          <li key={user.ID}>
+            <h2 className="text-lg text-primary-500 font-bold">{user.Username}</h2>
+            <p className="text-secondary-500">{user.Description}</p>
           </li>
         ))}
       </ul>

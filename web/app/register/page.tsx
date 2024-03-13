@@ -11,9 +11,9 @@ export default function Page() {
         e.preventDefault();
         console.log(username, email, description);
         axios.post("http://localhost:8080/user", {
-            username,
-            email,
-            description
+            Username: username,
+            Email: email,
+            Description: description
         });
         setUsername("");
         setEmail("");

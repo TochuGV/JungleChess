@@ -12,9 +12,9 @@ class UserService {
     async create(user: User): Promise<number> {
         const pool = await sql.connect(databaseConfig);
         const response = await pool.request()
-            .input("username", sql.VarChar(50), user.username)
-            .input("email", sql.VarChar(100), user.email)
-            .input("description", sql.VarChar(300), user.description)
+            .input("Username", sql.VarChar(50), user.Username)
+            .input("Email", sql.VarChar(100), user.Email)
+            .input("Description", sql.VarChar(300), user.Description)
             .execute<{ id: number }>("createUser");
         return response.recordset[0].id;
     }
