@@ -15,6 +15,9 @@ module.exports = {
 			neutral: colors.neutral,
 		},
 		extend: {
+			spacing: {
+			  '84': '21rem',
+			},
 			colors: {
 				primary: {
 					100: "#DFF2D6",
