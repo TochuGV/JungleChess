@@ -44,6 +44,23 @@ function End(props: EndProps) {
   );
 }
 
+interface PieceProps {
+  piece: string;
+}
+
+function Piece(props: PieceProps) {
+  return (
+    <Image
+      className="absolute translate-x-72 translate-y-72"
+      src={`/assets/pieces/${props.piece}.svg`}
+      alt="piece"
+      draggable={false}
+      width={48}
+      height={48}
+    />
+  );
+}
+
 export default function Page() {
   return (
     <div className="m-auto my-8 w-fit grid grid-cols-7">
@@ -60,6 +77,7 @@ export default function Page() {
       <Trap position="translate-x-48 translate-y-96" />
       <End position="translate-x-36" />
       <End position="translate-x-36 translate-y-96" />
+      <Piece piece="BR" />
     </div>
   );
 }
