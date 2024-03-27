@@ -82,7 +82,6 @@ export default function Page() {
   const boardRef = useRef<any>();
 
   const handleClick = (event: any) => {
-    // hacer una interfaz con la data del tablero
     if (!pieces) return;
     const board = boardRef.current?.getBoundingClientRect();
     const x = Math.floor((event.clientX - board.left) / 48);
@@ -113,7 +112,16 @@ export default function Page() {
       }
     }
     /*
+      Hacer una interfaz con la data del tablero
       Agregar lógica en los movimientos
+        - Hacer que el Leon y el Tigre salten el agua
+        - Hacer que solo la rata pueda pasar por el agua
+        - Hacer que las piezas se coman entre sí
+          - Acordarse que la rata come al elefante
+          - La rata no puede comer al elefante desde el agua
+        - Manejar los turnos
+        - Lógica de trampas
+        - Detectar si alguien gana
     */
   }
 
