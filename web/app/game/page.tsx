@@ -1,8 +1,9 @@
 "use client";
-import getCellColor from "@/helpers/game/getCellColor";
+import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
+import getPosibleMoves from "@/helpers/game/getPosibleMoves";
 import loadPieces from "@/helpers/game/loadPieces";
-import { PieceType } from "@/types/game";
+import { BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
 import { MouseEventHandler, useRef, useState } from "react";
 
@@ -43,7 +44,7 @@ function End(props: EndProps) {
 interface PieceProps {
   piece: string;
   // x : [0, 6], y: [0, 8]
-  position: { x: number, y: number };
+  position: BoardPosition;
 }
 
 function Piece(props: PieceProps) {
@@ -60,24 +61,62 @@ function Piece(props: PieceProps) {
   );
 }
 
+function checkIfPieceWillMove(x: number, y: number, pieces: PieceType[], activeCell?: BoardPosition) {
+  let willMove = false;
+  if (activeCell) {
+    const possibleMoves = getPosibleMoves(pieces, activeCell);
+
+    for (let possibleMove of possibleMoves) {
+      if (possibleMove.x == x && possibleMove.y == y) {
+        willMove = true;
+      }
+    }
+  }
+
+  return willMove
+}
+
 export default function Page() {
   const [pieces, setPieces] = useState<PieceType[] | undefined>(loadPieces());
+  const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
   const boardRef = useRef<any>();
 
   const handleClick = (event: any) => {
+    // hacer una interfaz con la data del tablero
+    if (!pieces) return;
     const board = boardRef.current?.getBoundingClientRect();
     const x = Math.floor((event.clientX - board.left) / 48);
     const y = Math.floor((event.clientY - board.top) / 48);
     if (x != -1 && y != -1) {
-      console.log(x, y);
+      if (checkIfPieceWillMove(x, y, pieces, activeCell)) {
+        // move a piece
+        if (!activeCell) return;
+        const pieceIndex = pieces.findIndex(piece => piece.position.x == activeCell.x && piece.position.y == activeCell.y);
+        const piece = pieces[pieceIndex];
+        setPieces(prev => prev 
+          ? [
+            ...prev.slice(0, pieceIndex),
+            {
+              ...piece,
+              position: { x, y }
+            },
+            ...prev.slice(pieceIndex + 1)
+          ]
+          : []);
+        setActiveCell(undefined);
+      } else if (getPosibleMoves(pieces, { x, y }).length != 0) {
+        // select a piece
+        setActiveCell({ x, y });
+      } else if (activeCell && getPosibleMoves(pieces, activeCell).length != 0) {
+        // unselect a piece
+        setActiveCell(undefined);
+      }
     }
     /*
-      Hacer que la pieza aparezca como activa
-      Hacer que la pieza ya no aparezca como activa cuando haces click en otro lugar
-      Mover la pieza
       Agregar lógica en los movimientos
     */
   }
+
 
   return (
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
@@ -86,6 +125,22 @@ export default function Page() {
           <div key={x + y} className={`w-12 h-12 ${getCellColor(x, y)}`}></div>
         ))
       ))}
+      {activeCell &&
+        <div
+          className={`absolute w-12 h-12 ${getActiveCellColor(activeCell.x, activeCell.y)}`}
+          style={{ transform: `translate(${activeCell.x * 48}px, ${activeCell.y * 48}px)` }}
+        ></div>}
+
+      {pieces && activeCell && getPosibleMoves(pieces, activeCell).map(position => (
+        <div
+          key={`${position.x} ${position.y}`}
+          className={`absolute w-12 h-12 grid place-content-center z-20`}
+          style={{ transform: `translate(${position.x * 48}px, ${position.y * 48}px)` }}
+        >
+          <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
+        </div>
+      ))}
+
       <Trap position="translate-x-24" />
       <Trap position="translate-x-36 translate-y-12" />
       <Trap position="translate-x-48" />

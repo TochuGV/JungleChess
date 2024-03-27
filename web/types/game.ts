@@ -12,9 +12,14 @@ export enum PieceAnimal {
     LION,
     ELEPHANT,
 }
+
+export interface BoardPosition {
+    x: number;
+    y: number;
+}
   
 export interface PieceType {
     animal: PieceAnimal;
-    position: { x: number, y: number };
+    position: BoardPosition;
     color: PieceColor;
 }
