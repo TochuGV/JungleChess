@@ -32,7 +32,21 @@ export default function getPosibleMoves(
         };
         
         if (piece.animal == PieceAnimal.TIGER || piece.animal == PieceAnimal.LION) {
+            const ratPositions: BoardPosition[] = [];
+            
+            for (let p of pieces)
+                if (p.animal == PieceAnimal.RAT)
+                    ratPositions.push(p.position);
+
             while (newPosition.x >= 1 && newPosition.x <= 5 && newPosition.x !== 3 && newPosition.y >= 3 && newPosition.y <= 5) {
+                let ratBlockingWaterJump = false;
+                for (let ratPosition of ratPositions)
+                    if (ratPosition.x == newPosition.x && ratPosition.y == newPosition.y)
+                        ratBlockingWaterJump = true;
+
+                if (ratBlockingWaterJump)
+                    break;
+
                 newPosition.x += direction[0];
                 newPosition.y += direction[1];
             }

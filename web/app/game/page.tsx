@@ -143,8 +143,10 @@ export default function Page() {
     /*
       Hacer una interfaz con la data del tablero
       Agregar lógica en los movimientos
-        - Hacer que el Leon y el Tigre salten el agua
-        - Hacer que solo la rata pueda pasar por el agua
+        - Hacer que el Leon y el Tigre salten el agua HECHO
+        - Hacer que solo la rata pueda pasar por el agua HECHO
+          - Hacer que el Leon y Tigre no salten sobre la Rata HECHO
+        - Manejar bien las trampas y el agua
         - Hacer que las piezas se coman entre sí
           - Acordarse que la rata come al elefante
           - La rata no puede comer al elefante desde el agua
