@@ -61,10 +61,16 @@ function Piece(props: PieceProps) {
   );
 }
 
-function checkIfPieceWillMove(x: number, y: number, pieces: PieceType[], activeCell?: BoardPosition) {
+function checkIfPieceWillMove(
+  x: number,
+  y: number,
+  pieces: PieceType[],
+  piece: PieceType,
+  activeCell?: BoardPosition
+) {
   let willMove = false;
   if (activeCell) {
-    const possibleMoves = getPosibleMoves(pieces, activeCell);
+    const possibleMoves = getPosibleMoves(pieces, piece, activeCell);
 
     for (let possibleMove of possibleMoves) {
       if (possibleMove.x == x && possibleMove.y == y) {
@@ -74,6 +80,18 @@ function checkIfPieceWillMove(x: number, y: number, pieces: PieceType[], activeC
   }
 
   return willMove
+}
+
+function getPieceByPosition(
+  pieces: PieceType[],
+  activeCell: BoardPosition
+): {
+  piece: PieceType,
+  pieceIndex: number
+} {
+  const pieceIndex = pieces.findIndex(piece => piece.position.x == activeCell.x && piece.position.y == activeCell.y);
+  const piece = pieces[pieceIndex];
+  return { piece, pieceIndex };
 }
 
 export default function Page() {
@@ -86,27 +104,38 @@ export default function Page() {
     const board = boardRef.current?.getBoundingClientRect();
     const x = Math.floor((event.clientX - board.left) / 48);
     const y = Math.floor((event.clientY - board.top) / 48);
+
     if (x != -1 && y != -1) {
-      if (checkIfPieceWillMove(x, y, pieces, activeCell)) {
-        // move a piece
-        if (!activeCell) return;
-        const pieceIndex = pieces.findIndex(piece => piece.position.x == activeCell.x && piece.position.y == activeCell.y);
-        const piece = pieces[pieceIndex];
-        setPieces(prev => prev 
-          ? [
-            ...prev.slice(0, pieceIndex),
-            {
-              ...piece,
-              position: { x, y }
-            },
-            ...prev.slice(pieceIndex + 1)
-          ]
-          : []);
-        setActiveCell(undefined);
-      } else if (getPosibleMoves(pieces, { x, y }).length != 0) {
+      let hasMoved = false;
+      // The piece that is in the cell that will be eaten
+      const currentPiece = getPieceByPosition(pieces, { x, y }).piece;
+
+      if (activeCell) {
+        // The piece that will move
+        const activeCellPiece = getPieceByPosition(pieces, activeCell).piece;
+        if (checkIfPieceWillMove(x, y, pieces, activeCellPiece, activeCell)) {
+          const { piece, pieceIndex } = getPieceByPosition(pieces, activeCell);
+
+          // move a piece
+          setPieces(prev => prev 
+            ? [
+              ...prev.slice(0, pieceIndex),
+              {
+                ...piece,
+                position: { x, y }
+              },
+              ...prev.slice(pieceIndex + 1)
+            ]
+            : []);
+          setActiveCell(undefined);
+          hasMoved = true;
+        }
+      }
+      
+      if (!hasMoved && getPosibleMoves(pieces, currentPiece, { x, y }).length != 0) {
         // select a piece
         setActiveCell({ x, y });
-      } else if (activeCell && getPosibleMoves(pieces, activeCell).length != 0) {
+      } else {
         // unselect a piece
         setActiveCell(undefined);
       }
@@ -125,7 +154,6 @@ export default function Page() {
     */
   }
 
-
   return (
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
       {new Array(9).fill(null).map((_, y) => (
@@ -139,7 +167,12 @@ export default function Page() {
           style={{ transform: `translate(${activeCell.x * 48}px, ${activeCell.y * 48}px)` }}
         ></div>}
 
-      {pieces && activeCell && getPosibleMoves(pieces, activeCell).map(position => (
+      {pieces && activeCell && 
+        getPosibleMoves(
+          pieces,
+          getPieceByPosition(pieces, activeCell).piece,
+          activeCell
+        ).map(position => (
         <div
           key={`${position.x} ${position.y}`}
           className={`absolute w-12 h-12 grid place-content-center z-20`}
