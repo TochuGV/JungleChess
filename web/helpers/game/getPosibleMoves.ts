@@ -9,7 +9,6 @@ export default function getPosibleMoves(
     piece: PieceType | undefined,
     activeCell: BoardPosition
 ): BoardPosition[] {
-    console.log(activeCell, piece);
     if (piece == undefined)
         return [];
 
@@ -36,6 +35,12 @@ export default function getPosibleMoves(
             while (newPosition.x >= 1 && newPosition.x <= 5 && newPosition.x !== 3 && newPosition.y >= 3 && newPosition.y <= 5) {
                 newPosition.x += direction[0];
                 newPosition.y += direction[1];
+            }
+        }
+        
+        if (piece.animal != PieceAnimal.RAT) {
+            if (newPosition.x >= 1 && newPosition.x <= 5 && newPosition.x !== 3 && newPosition.y >= 3 && newPosition.y <= 5) {
+                continue;
             }
         }
 
