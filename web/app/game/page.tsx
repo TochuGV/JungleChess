@@ -116,18 +116,13 @@ export default function Page() {
         const activeCellPiece = getPieceByPosition(board.pieces, activeCell).piece;
         if (checkIfPieceWillMove(x, y, board, board.pieces, activeCellPiece, activeCell)) {
           const { piece, pieceIndex } = getPieceByPosition(board.pieces, activeCell);
+          const { pieceIndex: pieceToEatIndex } = getPieceByPosition(board.pieces, { x, y });
 
           // move a piece
           setBoard(prev => ({
               ...prev,
-              pieces: [
-                ...prev.pieces.slice(0, pieceIndex),
-                {
-                  ...piece,
-                  position: { x, y }
-                },
-                ...prev.pieces.slice(pieceIndex + 1)
-              ]
+              pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
+                                 .filter((_, idx) => idx != pieceToEatIndex)
             }));
             
           setActiveCell(undefined);
@@ -144,12 +139,7 @@ export default function Page() {
       }
     }
     /*
-      Hacer una interfaz con la data del tablero
       Agregar lógica en los movimientos
-        - Hacer que el Leon y el Tigre salten el agua HECHO
-        - Hacer que solo la rata pueda pasar por el agua HECHO
-          - Hacer que el Leon y Tigre no salten sobre la Rata HECHO
-        - Manejar bien las trampas y el agua
         - Hacer que las piezas se coman entre sí
           - Acordarse que la rata come al elefante
           - La rata no puede comer al elefante desde el agua
