@@ -1,10 +1,15 @@
-import { BoardPosition, PieceAnimal, PieceType } from "@/types/game";
+import { Board, BoardPosition, PieceAnimal, PieceType } from "@/types/game";
 
-function isInBounds(x: number, y: number) {
-    return x >= 0 && y >= 0 && x < 7 && y < 9;
+function positionHasWater(board: Board, x: number, y: number) {
+    return board.objects.water.some(e => e.position.x == x && e.position.y == y);
+}
+
+function isInBounds(board: Board, x: number, y: number) {
+    return x >= 0 && y >= 0 && x < board.width && y < board.height;
 }
 
 export default function getPosibleMoves(
+    board: Board,
     pieces: PieceType[],
     piece: PieceType | undefined,
     activeCell: BoardPosition
@@ -38,7 +43,7 @@ export default function getPosibleMoves(
                 if (p.animal == PieceAnimal.RAT)
                     ratPositions.push(p.position);
 
-            while (newPosition.x >= 1 && newPosition.x <= 5 && newPosition.x !== 3 && newPosition.y >= 3 && newPosition.y <= 5) {
+            while (positionHasWater(board, newPosition.x, newPosition.y)) {
                 let ratBlockingWaterJump = false;
                 for (let ratPosition of ratPositions)
                     if (ratPosition.x == newPosition.x && ratPosition.y == newPosition.y)
@@ -53,12 +58,12 @@ export default function getPosibleMoves(
         }
         
         if (piece.animal != PieceAnimal.RAT) {
-            if (newPosition.x >= 1 && newPosition.x <= 5 && newPosition.x !== 3 && newPosition.y >= 3 && newPosition.y <= 5) {
+            if (positionHasWater(board, newPosition.x, newPosition.y)) {
                 continue;
             }
         }
 
-        if (isInBounds(newPosition.x, newPosition.y)) {
+        if (isInBounds(board, newPosition.x, newPosition.y)) {
             positions.push(newPosition);
         }
     }

@@ -35,7 +35,20 @@ function loadObjects(): Board["objects"] {
             { type: BoardObjectType.END, position: { x: 3, y: 0 }, color: PieceColor.RED },
             { type: BoardObjectType.END, position: { x: 3, y: 8 }, color: PieceColor.BLUE },
         ],
-        water: []
+        water: [
+            { type: BoardObjectType.WATER, position: { x: 1, y: 3 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 2, y: 3 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 4, y: 3 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 5, y: 3 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 1, y: 4 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 2, y: 4 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 4, y: 4 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 5, y: 4 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 1, y: 5 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 2, y: 5 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 4, y: 5 }, color: null },
+            { type: BoardObjectType.WATER, position: { x: 5, y: 5 }, color: null },
+        ]
     };
 }
 

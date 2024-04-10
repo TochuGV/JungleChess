@@ -5,7 +5,7 @@ import getPosibleMoves from "@/helpers/game/getPosibleMoves";
 import loadBoard from "@/helpers/game/loadBoard";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
-import { MouseEventHandler, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 interface TrapProps {
   position: string;
@@ -64,13 +64,14 @@ function Piece(props: PieceProps) {
 function checkIfPieceWillMove(
   x: number,
   y: number,
+  board: Board,
   pieces: PieceType[],
   piece: PieceType,
   activeCell?: BoardPosition
 ) {
   let willMove = false;
   if (activeCell) {
-    const possibleMoves = getPosibleMoves(pieces, piece, activeCell);
+    const possibleMoves = getPosibleMoves(board, pieces, piece, activeCell);
 
     for (let possibleMove of possibleMoves) {
       if (possibleMove.x == x && possibleMove.y == y) {
@@ -113,7 +114,7 @@ export default function Page() {
       if (activeCell) {
         // The piece that will move
         const activeCellPiece = getPieceByPosition(board.pieces, activeCell).piece;
-        if (checkIfPieceWillMove(x, y, board.pieces, activeCellPiece, activeCell)) {
+        if (checkIfPieceWillMove(x, y, board, board.pieces, activeCellPiece, activeCell)) {
           const { piece, pieceIndex } = getPieceByPosition(board.pieces, activeCell);
 
           // move a piece
@@ -134,7 +135,7 @@ export default function Page() {
         }
       }
       
-      if (!hasMoved && getPosibleMoves(board.pieces, currentPiece, { x, y }).length != 0) {
+      if (!hasMoved && getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0) {
         // select a piece
         setActiveCell({ x, y });
       } else {
@@ -162,7 +163,7 @@ export default function Page() {
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
       {new Array(board.height).fill(null).map((_, y) => (
         new Array(board.width).fill(null).map((_, x) => (
-          <div key={x + y} className={`w-12 h-12 ${getCellColor(x, y)}`}></div>
+          <div key={x + y} className={`w-12 h-12 bg-primary-${getCellColor(x, y)}`}></div>
         ))
       ))}
 
@@ -172,6 +173,16 @@ export default function Page() {
 
       {board.objects.ends.map(end => 
         <End position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`} />
+      )}
+
+      {board.objects.water.map(water => 
+        <div
+          key={`${water.position.x}-${water.position.y}`}
+          className={`absolute w-12 h-12
+                      translate-x-[${water.position.x * 48}px]
+                      translate-y-[${water.position.y * 48}px]
+                      bg-secondary-${getCellColor(water.position.x, water.position.y)}`}
+        ></div>
       )}
 
       {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} />)}
@@ -184,6 +195,7 @@ export default function Page() {
 
       {board.pieces && activeCell && 
         getPosibleMoves(
+          board,
           board.pieces,
           getPieceByPosition(board.pieces, activeCell).piece,
           activeCell
