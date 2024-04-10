@@ -141,6 +141,8 @@ export default function Page() {
     /*
       Agregar lógica en los movimientos
         - Hacer que las piezas se coman entre sí
+          - No comer a los compañeros
+          - Comer sii el valor de la pieza es mayor o igual al valor de la otra pieza
           - Acordarse que la rata come al elefante
           - La rata no puede comer al elefante desde el agua
         - Manejar los turnos
