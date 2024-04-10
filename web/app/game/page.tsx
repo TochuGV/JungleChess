@@ -2,8 +2,8 @@
 import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
 import getPosibleMoves from "@/helpers/game/getPosibleMoves";
-import loadPieces from "@/helpers/game/loadPieces";
-import { BoardPosition, PieceType } from "@/types/game";
+import loadBoard from "@/helpers/game/loadBoard";
+import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
 import { MouseEventHandler, useRef, useState } from "react";
 
@@ -95,44 +95,46 @@ function getPieceByPosition(
 }
 
 export default function Page() {
-  const [pieces, setPieces] = useState<PieceType[] | undefined>(loadPieces());
+  const [board, setBoard] = useState<Board>(loadBoard());
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
   const boardRef = useRef<any>();
 
   const handleClick = (event: any) => {
-    if (!pieces) return;
-    const board = boardRef.current?.getBoundingClientRect();
-    const x = Math.floor((event.clientX - board.left) / 48);
-    const y = Math.floor((event.clientY - board.top) / 48);
+    if (!board.pieces) return;
+    const boardElement = boardRef.current?.getBoundingClientRect();
+    const x = Math.floor((event.clientX - boardElement.left) / 48);
+    const y = Math.floor((event.clientY - boardElement.top) / 48);
 
     if (x != -1 && y != -1) {
       let hasMoved = false;
       // The piece that is in the cell that will be eaten
-      const currentPiece = getPieceByPosition(pieces, { x, y }).piece;
+      const currentPiece = getPieceByPosition(board.pieces, { x, y }).piece;
 
       if (activeCell) {
         // The piece that will move
-        const activeCellPiece = getPieceByPosition(pieces, activeCell).piece;
-        if (checkIfPieceWillMove(x, y, pieces, activeCellPiece, activeCell)) {
-          const { piece, pieceIndex } = getPieceByPosition(pieces, activeCell);
+        const activeCellPiece = getPieceByPosition(board.pieces, activeCell).piece;
+        if (checkIfPieceWillMove(x, y, board.pieces, activeCellPiece, activeCell)) {
+          const { piece, pieceIndex } = getPieceByPosition(board.pieces, activeCell);
 
           // move a piece
-          setPieces(prev => prev 
-            ? [
-              ...prev.slice(0, pieceIndex),
-              {
-                ...piece,
-                position: { x, y }
-              },
-              ...prev.slice(pieceIndex + 1)
-            ]
-            : []);
+          setBoard(prev => ({
+              ...prev,
+              pieces: [
+                ...prev.pieces.slice(0, pieceIndex),
+                {
+                  ...piece,
+                  position: { x, y }
+                },
+                ...prev.pieces.slice(pieceIndex + 1)
+              ]
+            }));
+            
           setActiveCell(undefined);
           hasMoved = true;
         }
       }
       
-      if (!hasMoved && getPosibleMoves(pieces, currentPiece, { x, y }).length != 0) {
+      if (!hasMoved && getPosibleMoves(board.pieces, currentPiece, { x, y }).length != 0) {
         // select a piece
         setActiveCell({ x, y });
       } else {
@@ -158,21 +160,32 @@ export default function Page() {
 
   return (
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
-      {new Array(9).fill(null).map((_, y) => (
-        new Array(7).fill(null).map((_, x) => (
+      {new Array(board.height).fill(null).map((_, y) => (
+        new Array(board.width).fill(null).map((_, x) => (
           <div key={x + y} className={`w-12 h-12 ${getCellColor(x, y)}`}></div>
         ))
       ))}
+
+      {board.objects.traps.map(trap => 
+        <Trap position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`} />
+      )}
+
+      {board.objects.ends.map(end => 
+        <End position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`} />
+      )}
+
+      {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} />)}
+
       {activeCell &&
         <div
           className={`absolute w-12 h-12 ${getActiveCellColor(activeCell.x, activeCell.y)}`}
           style={{ transform: `translate(${activeCell.x * 48}px, ${activeCell.y * 48}px)` }}
         ></div>}
 
-      {pieces && activeCell && 
+      {board.pieces && activeCell && 
         getPosibleMoves(
-          pieces,
-          getPieceByPosition(pieces, activeCell).piece,
+          board.pieces,
+          getPieceByPosition(board.pieces, activeCell).piece,
           activeCell
         ).map(position => (
         <div
@@ -183,16 +196,6 @@ export default function Page() {
           <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
         </div>
       ))}
-
-      <Trap position="translate-x-24" />
-      <Trap position="translate-x-36 translate-y-12" />
-      <Trap position="translate-x-48" />
-      <Trap position="translate-x-24 translate-y-96" />
-      <Trap position="translate-x-36 translate-y-84" />
-      <Trap position="translate-x-48 translate-y-96" />
-      <End position="translate-x-36" />
-      <End position="translate-x-36 translate-y-96" />
-      {pieces?.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} />)}
     </div>
   );
 }

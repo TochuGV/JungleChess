@@ -1,6 +1,6 @@
-import { PieceAnimal, PieceColor, PieceType } from "@/types/game";
+import { Board, BoardObjectType, PieceAnimal, PieceColor, PieceType } from "@/types/game";
 
-export default function loadPieces(): PieceType[] {
+function loadPieces(): PieceType[] {
     return [
        { animal: PieceAnimal.RAT, color: PieceColor.RED, position: { x: 0, y: 2 } },
        { animal: PieceAnimal.CAT, color: PieceColor.RED, position: { x: 5, y: 1 } },
@@ -19,4 +19,32 @@ export default function loadPieces(): PieceType[] {
        { animal: PieceAnimal.LION, color: PieceColor.BLUE, position: { x: 6, y: 8 } },
        { animal: PieceAnimal.ELEPHANT, color: PieceColor.BLUE, position: { x: 0, y: 6 } },
     ];
+}
+
+function loadObjects(): Board["objects"] {
+    return {
+        traps: [
+            { type: BoardObjectType.TRAP, position: { x: 2, y: 0 }, color: PieceColor.RED },
+            { type: BoardObjectType.TRAP, position: { x: 4, y: 0 }, color: PieceColor.RED },
+            { type: BoardObjectType.TRAP, position: { x: 3, y: 1 }, color: PieceColor.RED },
+            { type: BoardObjectType.TRAP, position: { x: 3, y: 7 }, color: PieceColor.BLUE },
+            { type: BoardObjectType.TRAP, position: { x: 2, y: 8 }, color: PieceColor.BLUE },
+            { type: BoardObjectType.TRAP, position: { x: 4, y: 8 }, color: PieceColor.BLUE }
+        ],
+        ends: [
+            { type: BoardObjectType.END, position: { x: 3, y: 0 }, color: PieceColor.RED },
+            { type: BoardObjectType.END, position: { x: 3, y: 8 }, color: PieceColor.BLUE },
+        ],
+        water: []
+    };
+}
+
+
+export default function loadBoard(): Board {
+    return {
+        width: 7,
+        height: 9,
+        objects: loadObjects(),
+        pieces: loadPieces()
+    }
 }

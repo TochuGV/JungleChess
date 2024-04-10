@@ -1,5 +1,6 @@
 export enum PieceColor {
-    BLUE, RED
+    BLUE,
+    RED
 }
   
 export enum PieceAnimal {
@@ -13,13 +14,45 @@ export enum PieceAnimal {
     ELEPHANT,
 }
 
-export interface BoardPosition {
-    x: number;
-    y: number;
-}
-  
 export interface PieceType {
     animal: PieceAnimal;
     position: BoardPosition;
     color: PieceColor;
 }
+
+
+// export enum GameModeEnum { // para mas adelante
+//     CLASSIC,
+// }
+
+export interface Board {
+    width: number;
+    height: number;
+    // turns: PieceColor[], // por si hay mas de dos jugadores y definir el orden en el que juegan
+    // clock_time: number, // para mas adelante
+    // game_mode: GameModeEnum, // para mas adelante
+    objects: {
+        traps: BoardObject[];
+        ends: BoardObject[];
+        water: BoardObject[];
+    },
+    pieces: PieceType[];
+}
+
+export interface BoardPosition {
+    x: number;
+    y: number;
+}
+
+export enum BoardObjectType {
+    END,
+    TRAP,
+    WATER,
+}
+
+export interface BoardObject {
+    type: BoardObjectType;
+    position: BoardPosition;
+    color: PieceColor | null; // por ahora para el final
+}
+  
