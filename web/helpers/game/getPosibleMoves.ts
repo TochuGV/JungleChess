@@ -14,17 +14,17 @@ function getActivePiece(pieces: PieceType[], activeCell: BoardPosition): PieceTy
     for (let piece of pieces)
         if (piece.position.x == activeCell.x && piece.position.y == activeCell.y)
             activePiece = piece;
-    
+
     return activePiece;
 }
 
 function getRatPositions(pieces: PieceType[]): BoardPosition[] {
     const ratPositions: BoardPosition[] = [];
-    
+
     for (let p of pieces)
         if (p.animal == PieceAnimal.RAT)
             ratPositions.push(p.position);
-    
+
     return ratPositions;
 }
 
@@ -35,13 +35,18 @@ function isRatBlockingWaterJump(ratPositions: BoardPosition[], position: BoardPo
     return false;
 }
 
+function getPieceAboutToEat(pieces: PieceType[], position: BoardPosition) {
+    const pieceAboutToEat = pieces.filter(piece => piece.position.x == position.x && piece.position.y == position.y);
+    return pieceAboutToEat.length == 0 ? null : pieceAboutToEat[0];
+}
+
 export default function getPosibleMoves(
     board: Board,
     pieces: PieceType[],
     piece: PieceType | undefined,
     activeCell: BoardPosition
 ): BoardPosition[] {
-    if (piece == undefined) return [];
+    if (piece == undefined || pieces == undefined) return [];
 
     const positions: BoardPosition[] = [];
     let activePiece: PieceType | null = getActivePiece(pieces, activeCell);
@@ -54,10 +59,10 @@ export default function getPosibleMoves(
             x: activePiece.position.x + direction[0],
             y: activePiece.position.y + direction[1]
         };
-        
+
         if (piece.animal == PieceAnimal.TIGER || piece.animal == PieceAnimal.LION) {
             const ratPositions: BoardPosition[] = getRatPositions(pieces);
-            
+
             while (positionHasWater(board, newPosition.x, newPosition.y)) {
                 if (isRatBlockingWaterJump(ratPositions, newPosition))
                     break;
@@ -66,10 +71,25 @@ export default function getPosibleMoves(
                 newPosition.y += direction[1];
             }
         }
-        
+
         if (piece.animal != PieceAnimal.RAT)
             if (positionHasWater(board, newPosition.x, newPosition.y))
                 continue;
+
+        const pieceAboutToEat = getPieceAboutToEat(pieces, newPosition);
+        if (pieceAboutToEat) {
+            if (piece.color == pieceAboutToEat.color)
+                continue;
+
+            const elephantToRat = piece.animal == PieceAnimal.ELEPHANT && pieceAboutToEat.animal == PieceAnimal.RAT;
+            if (elephantToRat)
+                continue;
+
+            const ratToElephant = piece.animal == PieceAnimal.RAT && pieceAboutToEat.animal == PieceAnimal.ELEPHANT;
+            const hasLessValue = piece.animal < pieceAboutToEat.animal;
+            if (!ratToElephant && hasLessValue)
+                continue;
+        }
 
         if (isInBounds(board, newPosition.x, newPosition.y))
             positions.push(newPosition);
