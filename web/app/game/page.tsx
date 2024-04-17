@@ -98,12 +98,10 @@ function getPieceByPosition(
 export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
-  const [hasGameEnded, setHasGameEnded] = useState<boolean>(false);
   const boardRef = useRef<any>();
 
   const handleClick = (event: any) => {
-    if (hasGameEnded) return;
-    if (!board.pieces) return;
+    if (!board.pieces || board.game_ended) return;
     const boardElement = boardRef.current?.getBoundingClientRect();
     const x = Math.floor((event.clientX - boardElement.left) / 48);
     const y = Math.floor((event.clientY - boardElement.top) / 48);
@@ -120,18 +118,20 @@ export default function Page() {
           const { piece, pieceIndex } = getPieceByPosition(board.pieces, activeCell);
           const { pieceIndex: pieceToEatIndex } = getPieceByPosition(board.pieces, { x, y });
 
+          const end = getEndInPosition(board, x, y);
+          let gameEnded = false;
+          if (end && end.color != piece.color) {
+            console.log("Me parece que alguien gano");
+            gameEnded = true;
+          }
+
           // move a piece
           setBoard(prev => ({
             ...prev,
             pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
-              .filter((_, idx) => idx != pieceToEatIndex)
+              .filter((_, idx) => idx != pieceToEatIndex),
+            game_ended: gameEnded
           }));
-
-          const end = getEndInPosition(board, x, y);
-          if (end && end.color != piece.color) {
-            console.log("Me parece que alguien gano");
-            setHasGameEnded(true);
-          }
 
           setActiveCell(undefined);
           hasMoved = true;
