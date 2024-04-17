@@ -12,6 +12,11 @@ function positionHasATrap(board: Board, x: number, y: number) {
     return board.objects.traps.some(e => e.position.x == x && e.position.y == y);
 }
 
+function getEndInPosition(board: Board, x: number, y: number) {
+    const end = board.objects.ends.find(e => e.position.x == x && e.position.y == y);
+    return end ? end : null;
+}
+
 function getActivePiece(pieces: PieceType[], activeCell: BoardPosition): PieceType | null {
     let activePiece: PieceType | null = null;
 
@@ -101,6 +106,10 @@ export default function getPosibleMoves(
             if (pieceIsRat && isInWater && !otherPieceIsInWater)
                 continue;
         }
+
+        const end = getEndInPosition(board, newPosition.x, newPosition.y);
+        if (end && end.color === piece.color)
+            continue;
 
         if (isInBounds(board, newPosition.x, newPosition.y))
             positions.push(newPosition);
