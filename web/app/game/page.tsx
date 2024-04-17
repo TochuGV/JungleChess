@@ -160,11 +160,17 @@ export default function Page() {
       ))}
 
       {board.objects.traps.map(trap =>
-        <Trap position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`} />
+        <Trap
+          position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`}
+          key={`${trap.position.x}-${trap.position.y}`}
+        />
       )}
 
       {board.objects.ends.map(end =>
-        <End position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`} />
+        <End
+          position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`}
+          key={`${end.position.x}-${end.position.y}`}
+        />
       )}
 
       {board.objects.water.map(water =>
