@@ -8,6 +8,10 @@ function positionHasWater(board: Board, x: number, y: number) {
     return board.objects.water.some(e => e.position.x == x && e.position.y == y);
 }
 
+function positionHasATrap(board: Board, x: number, y: number) {
+    return board.objects.traps.some(e => e.position.x == x && e.position.y == y);
+}
+
 function getActivePiece(pieces: PieceType[], activeCell: BoardPosition): PieceType | null {
     let activePiece: PieceType | null = null;
 
@@ -77,7 +81,8 @@ export default function getPosibleMoves(
                 continue;
 
         const pieceAboutToEat = getPieceAboutToEat(pieces, newPosition);
-        if (pieceAboutToEat) {
+        const otherIsVulnerable = positionHasATrap(board, newPosition.x, newPosition.y);
+        if (pieceAboutToEat && !otherIsVulnerable) {
             if (piece.color == pieceAboutToEat.color)
                 continue;
 

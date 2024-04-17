@@ -120,16 +120,16 @@ export default function Page() {
 
           // move a piece
           setBoard(prev => ({
-              ...prev,
-              pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
-                                 .filter((_, idx) => idx != pieceToEatIndex)
-            }));
-            
+            ...prev,
+            pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
+              .filter((_, idx) => idx != pieceToEatIndex)
+          }));
+
           setActiveCell(undefined);
           hasMoved = true;
         }
       }
-      
+
       if (!hasMoved && getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0) {
         // select a piece
         setActiveCell({ x, y });
@@ -140,13 +140,8 @@ export default function Page() {
     }
     /*
       Agregar lógica en los movimientos
-        - Hacer que las piezas se coman entre sí
-          - No comer a los compañeros
-          - Comer sii el valor de la pieza es mayor o igual al valor de la otra pieza
-          - Acordarse que la rata come al elefante
-          - La rata no puede comer al elefante desde el agua
-        - Manejar los turnos
         - Lógica de trampas
+        - Manejar los turnos
         - Detectar si alguien gana
     */
   }
@@ -159,15 +154,15 @@ export default function Page() {
         ))
       ))}
 
-      {board.objects.traps.map(trap => 
+      {board.objects.traps.map(trap =>
         <Trap position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`} />
       )}
 
-      {board.objects.ends.map(end => 
+      {board.objects.ends.map(end =>
         <End position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`} />
       )}
 
-      {board.objects.water.map(water => 
+      {board.objects.water.map(water =>
         <div
           key={`${water.position.x}-${water.position.y}`}
           className={`absolute w-12 h-12
@@ -185,21 +180,21 @@ export default function Page() {
           style={{ transform: `translate(${activeCell.x * 48}px, ${activeCell.y * 48}px)` }}
         ></div>}
 
-      {board.pieces && activeCell && 
+      {board.pieces && activeCell &&
         getPosibleMoves(
           board,
           board.pieces,
           getPieceByPosition(board.pieces, activeCell).piece,
           activeCell
         ).map(position => (
-        <div
-          key={`${position.x} ${position.y}`}
-          className={`absolute w-12 h-12 grid place-content-center z-20`}
-          style={{ transform: `translate(${position.x * 48}px, ${position.y * 48}px)` }}
-        >
-          <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
-        </div>
-      ))}
+          <div
+            key={`${position.x} ${position.y}`}
+            className={`absolute w-12 h-12 grid place-content-center z-20`}
+            style={{ transform: `translate(${position.x * 48}px, ${position.y * 48}px)` }}
+          >
+            <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
+          </div>
+        ))}
     </div>
   );
 }
