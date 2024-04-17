@@ -1,7 +1,7 @@
 "use client";
 import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
-import getPosibleMoves from "@/helpers/game/getPosibleMoves";
+import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMoves";
 import loadBoard from "@/helpers/game/loadBoard";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
@@ -98,9 +98,11 @@ function getPieceByPosition(
 export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
+  const [hasGameEnded, setHasGameEnded] = useState<boolean>(false);
   const boardRef = useRef<any>();
 
   const handleClick = (event: any) => {
+    if (hasGameEnded) return;
     if (!board.pieces) return;
     const boardElement = boardRef.current?.getBoundingClientRect();
     const x = Math.floor((event.clientX - boardElement.left) / 48);
@@ -125,6 +127,12 @@ export default function Page() {
               .filter((_, idx) => idx != pieceToEatIndex)
           }));
 
+          const end = getEndInPosition(board, x, y);
+          if (end && end.color != piece.color) {
+            console.log("Me parece que alguien gano");
+            setHasGameEnded(true);
+          }
+
           setActiveCell(undefined);
           hasMoved = true;
         }
@@ -139,10 +147,7 @@ export default function Page() {
       }
     }
     /*
-      Agregar lógica en los movimientos
-        - Lógica de trampas
-        - Manejar los turnos
-        - Detectar si alguien gana
+      - Manejar los turnos
     */
   }
 

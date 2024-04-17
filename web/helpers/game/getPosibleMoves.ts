@@ -12,7 +12,7 @@ function positionHasATrap(board: Board, x: number, y: number) {
     return board.objects.traps.some(e => e.position.x == x && e.position.y == y);
 }
 
-function getEndInPosition(board: Board, x: number, y: number) {
+export function getEndInPosition(board: Board, x: number, y: number) {
     const end = board.objects.ends.find(e => e.position.x == x && e.position.y == y);
     return end ? end : null;
 }
