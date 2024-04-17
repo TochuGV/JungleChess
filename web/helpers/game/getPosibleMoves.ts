@@ -89,6 +89,12 @@ export default function getPosibleMoves(
             const hasLessValue = piece.animal < pieceAboutToEat.animal;
             if (!ratToElephant && hasLessValue)
                 continue;
+
+            const pieceIsRat = piece.animal == PieceAnimal.RAT;
+            const isInWater = positionHasWater(board, piece.position.x, piece.position.y);
+            const otherPieceIsInWater = positionHasWater(board, newPosition.x, newPosition.y);
+            if (pieceIsRat && isInWater && !otherPieceIsInWater)
+                continue;
         }
 
         if (isInBounds(board, newPosition.x, newPosition.y))
