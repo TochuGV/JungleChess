@@ -110,7 +110,7 @@ export default function Page() {
       let hasMoved = false;
       // The piece that is in the cell that will be eaten
       const currentPiece = getPieceByPosition(board.pieces, { x, y }).piece;
-
+      
       if (activeCell) {
         // The piece that will move
         const activeCellPiece = getPieceByPosition(board.pieces, activeCell).piece;
@@ -130,7 +130,8 @@ export default function Page() {
             ...prev,
             pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
               .filter((_, idx) => idx != pieceToEatIndex),
-            game_ended: gameEnded
+            game_ended: gameEnded,
+            turn: board.turn < board.turns.length - 1 ? board.turn + 1 : 0
           }));
 
           setActiveCell(undefined);
@@ -138,19 +139,26 @@ export default function Page() {
         }
       }
 
-      if (!hasMoved && getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0) {
-        // select a piece
-        setActiveCell({ x, y });
-      } else {
+      const hasNoMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
+      
+      let pieceSelected = false;
+      if (currentPiece != undefined) {
+        const isPiecesTurn = currentPiece.color == board.turns[board.turn];
+
+        if (!hasMoved && hasNoMoves && isPiecesTurn) {
+          // select a piece
+          setActiveCell({ x, y });
+          pieceSelected = true;
+        }
+      }
+
+      if (!pieceSelected) {
         // unselect a piece
         setActiveCell(undefined);
       }
     }
-    /*
-      - Manejar los turnos
-    */
   }
-
+    
   return (
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
       {new Array(board.height).fill(null).map((_, y) => (

@@ -60,5 +60,7 @@ export default function loadBoard(): Board {
         objects: loadObjects(),
         pieces: loadPieces(),
         game_ended: false,
+        turns: [PieceColor.BLUE, PieceColor.RED],
+        turn: 0
     }
 }

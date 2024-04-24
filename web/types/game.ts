@@ -20,7 +20,6 @@ export interface PieceType {
     color: PieceColor;
 }
 
-
 // export enum GameModeEnum { // para mas adelante
 //     CLASSIC,
 // }
@@ -28,8 +27,8 @@ export interface PieceType {
 export interface Board {
     width: number;
     height: number;
-    // turns: PieceColor[], // por si hay mas de dos jugadores y definir el orden en el que juegan
-    // turn: PieceColor,
+    turns: PieceColor[], // por si hay mas de dos jugadores y definir el orden en el que juegan
+    turn: PieceColor,
     // clock_time: number, // para mas adelante
     // game_mode: GameModeEnum, // para mas adelante
     game_ended: boolean;
