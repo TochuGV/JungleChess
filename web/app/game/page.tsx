@@ -1,4 +1,6 @@
 "use client";
+import End from "@/components/game/End";
+import Trap from "@/components/game/Trap";
 import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
 import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMoves";
@@ -6,40 +8,6 @@ import loadBoard from "@/helpers/game/loadBoard";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
 import { useRef, useState } from "react";
-
-interface TrapProps {
-  position: string;
-}
-
-function Trap(props: TrapProps) {
-  return (
-    <Image
-      src="/assets/board/trap.png"
-      alt="Trap"
-      width={48}
-      height={48}
-      className={`absolute ${props.position} scale-75 select-none`}
-      draggable="false"
-    />
-  );
-}
-
-interface EndProps {
-  position: string;
-}
-
-function End(props: EndProps) {
-  return (
-    <Image
-      src="/assets/board/end.png"
-      alt="Trap"
-      width={48}
-      height={48}
-      className={`absolute ${props.position} scale-75 select-none`}
-      draggable="false"
-    />
-  );
-}
 
 interface PieceProps {
   piece: string;
@@ -110,7 +78,7 @@ export default function Page() {
       let hasMoved = false;
       // The piece that is in the cell that will be eaten
       const currentPiece = getPieceByPosition(board.pieces, { x, y }).piece;
-      
+
       if (activeCell) {
         // The piece that will move
         const activeCellPiece = getPieceByPosition(board.pieces, activeCell).piece;
@@ -140,7 +108,7 @@ export default function Page() {
       }
 
       const hasNoMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
-      
+
       let pieceSelected = false;
       if (currentPiece != undefined) {
         const isPiecesTurn = currentPiece.color == board.turns[board.turn];
@@ -158,7 +126,7 @@ export default function Page() {
       }
     }
   }
-    
+
   return (
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
       {new Array(board.height).fill(null).map((_, y) => (
@@ -170,6 +138,7 @@ export default function Page() {
       {board.objects.traps.map(trap =>
         <Trap
           position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`}
+          color={trap.color}
           key={`${trap.position.x}-${trap.position.y}`}
         />
       )}
@@ -177,6 +146,7 @@ export default function Page() {
       {board.objects.ends.map(end =>
         <End
           position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`}
+          color={end.color}
           key={`${end.position.x}-${end.position.y}`}
         />
       )}
