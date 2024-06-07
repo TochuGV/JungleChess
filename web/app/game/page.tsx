@@ -8,24 +8,25 @@ import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMove
 import loadBoard from "@/helpers/game/loadBoard";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 interface PieceProps {
   piece: string;
   // x : [0, 6], y: [0, 8]
   position: BoardPosition;
+  cellSize: number;
 }
 
 function Piece(props: PieceProps) {
   return (
     <Image
       className={`absolute`}
-      style={{ transform: `translate(${props.position.x * 48}px, ${props.position.y * 48}px)` }}
+      style={{ transform: `translate(${props.position.x * props.cellSize}px, ${props.position.y * props.cellSize}px)` }}
       src={`/assets/pieces/${props.piece}.svg`}
       alt="piece"
       draggable={false}
-      width={48}
-      height={48}
+      width={props.cellSize}
+      height={props.cellSize}
     />
   );
 }
@@ -68,12 +69,36 @@ export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
   const boardRef = useRef<any>();
+  const [cellSize, setCellSize] = useState<number>(0);
+
+  useLayoutEffect(() => {
+    let timeout: any = null;
+    function updateCellSize() {
+      clearTimeout(timeout);
+
+      timeout = setTimeout(() => {
+        let size = (window.innerHeight - 80) / board.height;
+
+        console.log(size, window.innerHeight / board.height, size < window.innerHeight / board.height)
+        if (size > (window.innerWidth - 40) / board.width) {
+          size = (window.innerWidth - 20) / board.width
+        }
+
+        setCellSize(size);
+      }, 50);
+    }
+
+    window.addEventListener("resize", updateCellSize);
+    updateCellSize();
+
+    return () => window.removeEventListener("resize", updateCellSize);
+  }, []);
 
   const handleClick = (event: any) => {
     if (!board.pieces || board.game_ended) return;
     const boardElement = boardRef.current?.getBoundingClientRect();
-    const x = Math.floor((event.clientX - boardElement.left) / 48);
-    const y = Math.floor((event.clientY - boardElement.top) / 48);
+    const x = Math.floor((event.clientX - boardElement.left) / cellSize);
+    const y = Math.floor((event.clientY - boardElement.top) / cellSize);
 
     if (x != -1 && y != -1) {
       let hasMoved = false;
@@ -132,13 +157,18 @@ export default function Page() {
     <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
       {new Array(board.height).fill(null).map((_, y) => (
         new Array(board.width).fill(null).map((_, x) => (
-          <div key={x + y} className={`w-12 h-12 bg-primary-${getCellColor(x, y)}`}></div>
+          <div
+            key={x + y}
+            style={{ height: cellSize, width: cellSize }}
+            className={`bg-primary-${getCellColor(x, y)}`}
+          ></div>
         ))
       ))}
 
       {board.objects.traps.map(trap =>
         <Trap
-          position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`}
+          position={trap.position}
+          cellSize={cellSize}
           color={trap.color}
           key={`${trap.position.x}-${trap.position.y}`}
         />
@@ -146,22 +176,31 @@ export default function Page() {
 
       {board.objects.ends.map(end =>
         <End
-          position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`}
+          position={end.position}
+          cellSize={cellSize}
           color={end.color}
           key={`${end.position.x}-${end.position.y}`}
         />
       )}
 
       {board.objects.water.map(water =>
-        <Water position={water.position} />
+        <Water
+          position={water.position}
+          cellSize={cellSize}
+          key={`${water.position.x}-${water.position.y}`}
+        />
       )}
 
-      {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} />)}
+      {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} cellSize={cellSize} />)}
 
       {activeCell &&
         <div
-          className={`absolute w-12 h-12 ${getActiveCellColor(activeCell.x, activeCell.y)}`}
-          style={{ transform: `translate(${activeCell.x * 48}px, ${activeCell.y * 48}px)` }}
+          className={`absolute ${getActiveCellColor(activeCell.x, activeCell.y)}`}
+          style={{
+            transform: `translate(${activeCell.x * cellSize}px, ${activeCell.y * cellSize}px)`,
+            width: cellSize,
+            height: cellSize
+          }}
         ></div>}
 
       {board.pieces && activeCell &&
@@ -173,8 +212,12 @@ export default function Page() {
         ).map(position => (
           <div
             key={`${position.x} ${position.y}`}
-            className={`absolute w-12 h-12 grid place-content-center z-20`}
-            style={{ transform: `translate(${position.x * 48}px, ${position.y * 48}px)` }}
+            className={`absolute grid place-content-center z-20`}
+            style={{
+              transform: `translate(${position.x * cellSize}px, ${position.y * cellSize}px)`,
+              width: cellSize,
+              height: cellSize
+            }}
           >
             <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
           </div>
