@@ -1,6 +1,7 @@
 "use client";
 import End from "@/components/game/End";
 import Trap from "@/components/game/Trap";
+import Water from "@/components/game/Water";
 import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
 import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMoves";
@@ -152,13 +153,7 @@ export default function Page() {
       )}
 
       {board.objects.water.map(water =>
-        <div
-          key={`${water.position.x}-${water.position.y}`}
-          className={`absolute w-12 h-12
-                      translate-x-[${water.position.x * 48}px]
-                      translate-y-[${water.position.y * 48}px]
-                      bg-secondary-${getCellColor(water.position.x, water.position.y)}`}
-        ></div>
+        <Water position={water.position} />
       )}
 
       {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} />)}

@@ -9,7 +9,7 @@ interface TrapProps {
 
 export default function Trap(props: TrapProps) {
   return (
-    <div className={`absolute ${props.position} bg-[#F49C00] w-12 h-12`}>
+    <div className={`absolute ${props.position} bg-trapBackground w-12 h-12`}>
       <Image
         src={`/assets/board/${props.color == PieceColor.BLUE ? "B" : "R"}T.svg`}
         alt="Trap"
