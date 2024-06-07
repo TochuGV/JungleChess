@@ -17,7 +17,7 @@ module.exports = {
 		},
 		extend: {
 			spacing: {
-			  '84': '21rem',
+				'84': '21rem',
 			},
 			colors: {
 				primary: {
@@ -34,7 +34,7 @@ module.exports = {
 				secondary: {
 					100: "#D2EEF0",
 					200: "#A6DEE1",
-					300: "#79CDD2",
+					300: "#00B6DF",
 					400: "#4DBCC3",
 					500: "#20ACB5",
 					600: "#1A8990",
@@ -42,6 +42,8 @@ module.exports = {
 					800: "#0D4548",
 					900: "#062224",
 				},
+				trapBackground: "#F49C00",
+				endBackground: "#FFFCE9",
 				background: {
 					100: "#E8E7E7",
 					300: "#AEADAC",
