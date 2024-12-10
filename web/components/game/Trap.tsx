@@ -1,28 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
 import Image from "next/image";
 import { BoardPosition, PieceColor } from "@/types/game";
+import { CellSizeContext } from "@/helpers/context";
 
 interface TrapProps {
   position: BoardPosition;
-  cellSize: number;
   color: PieceColor | null;
 }
 
 export default function Trap(props: TrapProps) {
+  const cellSize = useContext(CellSizeContext);
+
   return (
     <div
       className={`absolute ${props.position} bg-trapBackground`}
       style={{
-        transform: `translate(${props.position.x * props.cellSize}px, ${props.position.y * props.cellSize}px)`,
-        width: props.cellSize,
-        height: props.cellSize
+        transform: `translate(${props.position.x * cellSize}px, ${props.position.y * cellSize}px)`,
+        width: cellSize,
+        height: cellSize
       }}
     >
       <Image
         src={`/assets/board/${props.color == PieceColor.BLUE ? "B" : "R"}T.svg`}
         alt="Trap"
-        width={props.cellSize}
-        height={props.cellSize}
+        width={cellSize}
+        height={cellSize}
         className={`scale-75 select-none`}
         draggable="false"
       />
