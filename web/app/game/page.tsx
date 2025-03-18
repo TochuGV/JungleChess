@@ -24,7 +24,7 @@ interface PieceProps {
 function Piece(props: PieceProps) {
   return (
     <Image
-      className={`absolute`}
+      className={`absolute select-none`}
       style={{ transform: `translate(${props.position.x * props.cellSize}px, ${props.position.y * props.cellSize}px)` }}
       src={`/assets/pieces/${props.piece}.svg`}
       alt="piece"
@@ -69,12 +69,58 @@ function getPieceByPosition(
   return { piece, pieceIndex };
 }
 
+interface MoveListTableProps {
+  board: Board,
+  moveList: string[][]
+}
+
+function MoveListTable({ board, moveList }: MoveListTableProps) {
+  const { cellSize } = useCellSize(board, 100);
+  const moveListDummy = useRef<HTMLTableRowElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => moveListDummy.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 0);
+  }, [moveList]);
+
+  return (
+      <div
+        className="my-auto ml-4"
+        style={{ height: cellSize * 9 }}
+      >
+        <div
+          className="w-[300px] bg-neutral-700 overflow-y-scroll"
+          style={{ height: cellSize * 7, marginTop: cellSize }}
+        >
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th className="p-1 pl-4"></th>
+                <th className="p-1 text-left">Blue</th>
+                <th className="p-1 text-left">Red</th>
+              </tr>
+            </thead>
+            <tbody>
+              {moveList
+                .map((row, i) => <tr key={i} className="w-fit odd:bg-neutral-500">
+                  <td className="p-1 pl-4">{i + 1}</td>
+                  <td className="p-1">{row[0]}</td>
+                  <td className="p-1">{row[1]}</td>
+                </tr>)}
+              <tr ref={moveListDummy} tabIndex={-1}></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  );
+}
+
 export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
   const boardRef = useRef<any>();
   const { cellSize, margin } = useCellSize(board, 100);
   const [showEndModal, setShowEndModal] = useState<boolean>(false);
+  const [moveList, setMoveList] = useState<string[][]>([]);
 
   const handleClick = (event: any) => {
     if (!board.pieces || board.game_ended) return;
@@ -102,7 +148,17 @@ export default function Page() {
             setShowEndModal(true);
           }
 
-          // move a piece
+          // update move list
+          const formattedMove = getPieceSource(piece)[1] + (pieceToEatIndex != -1 ? "x" : "") + String.fromCharCode(x + 97) + (board.height - y).toString() + (gameEnded ? "#" : "");
+          if (moveList.length == 0 || moveList[moveList.length - 1].length == 2) {
+            setMoveList([...moveList, [formattedMove]])
+          } else {
+            setMoveList([
+              ...moveList.slice(0, moveList.length - 1),
+              [moveList[moveList.length - 1][0], formattedMove]
+            ]);
+          }
+
           setBoard(prev => ({
             ...prev,
             pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
@@ -140,12 +196,14 @@ export default function Page() {
     setBoard(loadBoard());
     setActiveCell(undefined);
     setShowEndModal(false);
+    setMoveList([]);
   }
 
   return (
     <CellSizeContext.Provider value={cellSize}>
+    <div className="flex m-auto w-fit">
       <div
-        className="m-auto w-fit grid grid-cols-7"
+        className="grid grid-cols-7"
         onMouseDown={handleClick}
         ref={boardRef}
         style={{
@@ -218,11 +276,12 @@ export default function Page() {
             </div>
           ))}
       </div>
-
-      <Modal show={showEndModal} hide={() => setShowEndModal(false)} className="px-8 py-4 rounded-sm">
-          <p className="text-xl mb-2">{whoWon(board)} won!</p>
-          <button onClick={resetGame} className="bg-primary-500 text-black px-6 py-2 rounded-sm">Play Again</button>
-      </Modal>
+      <MoveListTable {...{board, moveList}} />
+    </div>
+    <Modal show={showEndModal} hide={() => setShowEndModal(false)} className="px-8 py-4 rounded-sm">
+      <p className="text-xl mb-2">{whoWon(board)} won!</p>
+      <button onClick={resetGame} className="bg-primary-500 text-black px-6 py-2 rounded-sm">Play Again</button>
+    </Modal>
     </CellSizeContext.Provider>
   );
 }
