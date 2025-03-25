@@ -10,10 +10,10 @@ interface EndProps {
 
 export default function End(props: EndProps) {
   const cellSize = useContext(CellSizeContext);
-
+  
   return (
     <div
-      className={`absolute ${props.position} bg-endBackground`}
+      className={`absolute ${props.position} bg-endBackground-${props.color == PieceColor.BLUE ? 0 : 1}`}
       style={{
         transform: `translate(${props.position.x * cellSize}px, ${props.position.y * cellSize}px)`,
         width: cellSize,

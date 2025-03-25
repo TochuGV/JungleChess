@@ -10,7 +10,7 @@ import loadBoard from "@/helpers/game/loadBoard";
 import useCellSize from "@/hooks/useCellSize";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
-import { createContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useState, useRef } from "react";
 
 interface PieceProps {
   piece: string;
@@ -135,81 +135,119 @@ export default function Page() {
   console.log(margin)
 
   return (
-    <CellSizeContext.Provider value={cellSize}>
-      <div
-        className="m-auto w-fit grid grid-cols-7"
-        onMouseDown={handleClick}
-        ref={boardRef}
-        style={{
-          width: cellSize * board.width,
-          height: cellSize * board.height,
-          marginTop: margin.y / 2,
-          marginBottom: margin.y / 2,
-        }}>
-        {new Array(board.height).fill(null).map((_, y) => (
-          new Array(board.width).fill(null).map((_, x) => (
-            <div
-              key={x + y}
-              className={`bg-primary-${getCellColor(x, y)}`}
-            ></div>
-          ))
-        ))}
+		<CellSizeContext.Provider value={cellSize}>
+			<div
+				className="m-auto w-fit grid grid-cols-7"
+				onMouseDown={handleClick}
+				ref={boardRef}
+				style={{
+					width: cellSize * board.width,
+					height: cellSize * board.height,
+					marginTop: margin.y / 2,
+					marginBottom: margin.y / 2,
+				}}
+			>
+				{new Array(board.height).fill(null).map((_, y) =>
+					new Array(board.width).fill(null).map((_, x) => {
+						const isFirstRow = y === board.height - 1;
+						const isFirstColumn = x === 0;
+						return (
+							<div
+								key={`${x} - ${y}`}
+								className={`bg-primary-${getCellColor(x, y)}`}
+							>
+								{isFirstRow && (
+									<span
+										className="absolute text-white font-semibold z-10"
+										style={{transform: `translate(${cellSize - 16}px, ${cellSize - 20}px)`}}
+									>
+										{String.fromCharCode(65 + x)}
+									</span>
+								)}
+								{isFirstColumn && (
+									<span
+										className="absolute text-white font-semibold z-10"
+										style={{transform: `translate(4px, 2px)`}}
+									>
+										{board.height - y}
+									</span>
+								)}
+							</div>
+						);
+					})
+				)}
 
-        {board.objects.traps.map(trap =>
-          <Trap
-            position={trap.position}
-            color={trap.color}
-            key={`${trap.position.x}-${trap.position.y}`}
-          />
-        )}
+				{board.objects.traps.map((trap) => (
+					<Trap
+						position={trap.position}
+						color={trap.color}
+						key={`${trap.position.x}-${trap.position.y}`}
+					/>
+				))}
 
-        {board.objects.ends.map(end =>
-          <End
-            position={end.position}
-            color={end.color}
-            key={`${end.position.x}-${end.position.y}`}
-          />
-        )}
+				{board.objects.ends.map((end) => (
+					<End
+						position={end.position}
+						color={end.color}
+						key={`${end.position.x}-${end.position.y}`}
+					/>
+				))}
 
-        {board.objects.water.map(water =>
-          <Water
-            position={water.position}
-            key={`${water.position.x}-${water.position.y}`}
-          />
-        )}
+				{board.objects.water.map((water) => (
+					<Water
+						position={water.position}
+						key={`${water.position.x}-${water.position.y}`}
+					/>
+				))}
 
-        {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} cellSize={cellSize} />)}
+				{board.pieces.map((piece) => (
+					<Piece
+						key={getPieceSource(piece)}
+						piece={getPieceSource(piece)}
+						position={piece.position}
+						cellSize={cellSize}
+					/>
+				))}
 
-        {activeCell &&
-          <div
-            className={`absolute ${getActiveCellColor(activeCell.x, activeCell.y)}`}
-            style={{
-              transform: `translate(${activeCell.x * cellSize}px, ${activeCell.y * cellSize}px)`,
-              width: cellSize,
-              height: cellSize
-            }}
-          ></div>}
+				{activeCell && (
+					<div
+						className={`absolute ${getActiveCellColor(
+							activeCell.x,
+							activeCell.y
+						)}`}
+						style={{
+							transform: `translate(${activeCell.x * cellSize}px, ${
+								activeCell.y * cellSize
+							}px)`,
+							width: cellSize,
+							height: cellSize,
+						}}
+					></div>
+				)}
 
-        {board.pieces && activeCell &&
-          getPosibleMoves(
-            board,
-            board.pieces,
-            getPieceByPosition(board.pieces, activeCell).piece,
-            activeCell
-          ).map(position => (
-            <div
-              key={`${position.x} ${position.y}`}
-              className={`absolute grid place-content-center z-20`}
-              style={{
-                transform: `translate(${position.x * cellSize}px, ${position.y * cellSize}px)`,
-                width: cellSize,
-                height: cellSize
-              }}
-            >
-              <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
-            </div>
-          ))}
-      </div>
-    </CellSizeContext.Provider>
-  );
+				{board.pieces &&
+					activeCell &&
+					getPosibleMoves(
+						board,
+						board.pieces,
+						getPieceByPosition(board.pieces, activeCell).piece,
+						activeCell
+					).map((position) => (
+						<div
+							key={`${position.x} ${position.y}`}
+							className={`absolute grid place-content-center z-20`}
+							style={{
+								transform: `translate(${position.x * cellSize}px, ${
+									position.y * cellSize
+								}px)`,
+								width: cellSize,
+								height: cellSize,
+							}}
+						>
+							<div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
+						</div>
+					))}
+			</div>
+		</CellSizeContext.Provider>
+	);
 }

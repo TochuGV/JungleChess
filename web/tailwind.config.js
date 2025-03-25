@@ -43,7 +43,10 @@ module.exports = {
 					900: "#062224",
 				},
 				trapBackground: "#F49C00",
-				endBackground: "#FFFCE9",
+				endBackground: {
+					0: "#45A0C1",
+					1: "#C16544"
+				}, 
 				background: {
 					100: "#E8E7E7",
 					300: "#AEADAC",
