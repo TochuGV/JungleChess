@@ -13,7 +13,7 @@ export default function End(props: EndProps) {
   
   return (
     <div
-      className={`absolute ${props.position} bg-endBackground-${props.color == PieceColor.BLUE ? 0 : 1}`}
+      className={`absolute bg-endBackground-${props.color == PieceColor.BLUE ? 0 : 1}`}
       style={{
         transform: `translate(${props.position.x * cellSize}px, ${props.position.y * cellSize}px)`,
         width: cellSize,
@@ -35,3 +35,4 @@ function UseContext(CellSizeContext: React.Context<number>) {
   throw new Error("Function not implemented.");
 }
 
+// bg-endBackground-0 bg-endBackground-1
