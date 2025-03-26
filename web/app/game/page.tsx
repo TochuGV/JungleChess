@@ -1,5 +1,6 @@
 "use client";
 import End from "@/components/game/End";
+import Modal from "@/components/game/Modal";
 import Trap from "@/components/game/Trap";
 import Water from "@/components/game/Water";
 import { CellSizeContext } from "@/helpers/context";
@@ -7,6 +8,7 @@ import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
 import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMoves";
 import loadBoard from "@/helpers/game/loadBoard";
+import whoWon from "@/helpers/game/whoWon";
 import useCellSize from "@/hooks/useCellSize";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
@@ -72,6 +74,7 @@ export default function Page() {
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
   const boardRef = useRef<any>();
   const { cellSize, margin } = useCellSize(board, 100);
+  const [showEndModal, setShowEndModal] = useState<boolean>(false);
 
   const handleClick = (event: any) => {
     if (!board.pieces || board.game_ended) return;
@@ -96,6 +99,7 @@ export default function Page() {
           if (end && end.color != piece.color) {
             console.log("Me parece que alguien gano");
             gameEnded = true;
+            setShowEndModal(true);
           }
 
           // move a piece
@@ -132,7 +136,11 @@ export default function Page() {
     }
   }
 
-  console.log(margin)
+  const resetGame = () => {
+    setBoard(loadBoard());
+    setActiveCell(undefined);
+    setShowEndModal(false);
+  }
 
   return (
 		<CellSizeContext.Provider value={cellSize}>
