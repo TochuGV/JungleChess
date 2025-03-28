@@ -117,7 +117,6 @@ export default function Page() {
       }
 
       const hasNoMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
-
       let pieceSelected = false;
       if (currentPiece != undefined) {
         const isPiecesTurn = currentPiece.color == board.turns[board.turn];
