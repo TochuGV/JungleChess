@@ -12,7 +12,7 @@ import whoWon from "@/helpers/game/whoWon";
 import useCellSize from "@/hooks/useCellSize";
 import { Board, BoardPosition, PieceType } from "@/types/game";
 import Image from "next/image";
-import { createContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useState, useRef } from "react";
 
 interface PieceProps {
   piece: string;
@@ -200,7 +200,6 @@ export default function Page() {
       }
 
       const hasNoMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
-
       let pieceSelected = false;
       if (currentPiece != undefined) {
         const isPiecesTurn = currentPiece.color == board.turns[board.turn];
@@ -241,10 +240,29 @@ export default function Page() {
         }}>
         {new Array(board.height).fill(null).map((_, y) => (
           new Array(board.width).fill(null).map((_, x) => (
-            <div
-              key={x + y}
-              className={`bg-primary-${getCellColor(x, y)}`}
-            ></div>
+						const isFirstRow = y === board.height - 1;
+						const isFirstColumn = x === 0;
+						return (
+							<div
+								key={`${x} - ${y}`}
+								className={`bg-primary-${getCellColor(x, y)}`}
+							>
+								{isFirstRow && (
+									<span
+										className="absolute text-white font-semibold z-10"
+										style={{transform: `translate(${cellSize - 16}px, ${cellSize - 20}px)`}}
+									>
+										{String.fromCharCode(65 + x)}
+									</span>
+								)}
+								{isFirstColumn && (
+									<span
+										className="absolute text-white font-semibold z-10"
+										style={{transform: `translate(4px, 2px)`}}
+									>
+										{board.height - y}
+									</span>
+								)}
           ))
         ))}
 
