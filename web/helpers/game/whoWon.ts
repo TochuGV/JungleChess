@@ -2,11 +2,13 @@ import { Board, PieceColor } from "@/types/game";
 
 export default function whoWon(board: Board): string {
     let index: number = board.turns.findIndex(t => t == board.turn) - 1;
-    switch(index % board.turns.length) {
+    switch (index % board.turns.length) {
         case PieceColor.BLUE:
             return "Blue";
+            break;
         case PieceColor.RED:
             return "Red"
+            break;
         default:
             return ""
     }
