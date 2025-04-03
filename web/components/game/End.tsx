@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Image from "next/image";
-import { BoardPosition, PieceColor } from "@/types/game";
+import { Board, BoardPosition, PieceColor } from "@/types/game";
 import { CellSizeContext } from "@/helpers/context";
 
 interface EndProps {
@@ -8,7 +8,7 @@ interface EndProps {
   color: PieceColor | null;
 }
 
-export default function End(props: EndProps) {
+function End(props: EndProps) {
   const cellSize = useContext(CellSizeContext);
   
   return (
@@ -31,8 +31,21 @@ export default function End(props: EndProps) {
     </div>
   );
 }
-function UseContext(CellSizeContext: React.Context<number>) {
-  throw new Error("Function not implemented.");
+
+interface EndsProps {
+  board: Board;
+}
+
+export default function Ends({ board }: EndsProps) {
+  return <>
+        {board.objects.ends.map(end =>
+          <End
+            position={end.position}
+            color={end.color}
+            key={`${end.position.x}-${end.position.y}`}
+          />
+        )}
+  </>
 }
 
 // bg-endBackground-0 bg-endBackground-1

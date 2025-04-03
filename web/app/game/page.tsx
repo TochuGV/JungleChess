@@ -1,145 +1,23 @@
 "use client";
-import End from "@/components/game/End";
+import Ends from "@/components/game/End";
 import Modal from "@/components/game/Modal";
-import Trap from "@/components/game/Trap";
-import Water from "@/components/game/Water";
+import Traps from "@/components/game/Trap";
+import Waters from "@/components/game/Water";
+import Pieces from "@/components/game/Piece";
+import MoveListTable from "@/components/game/MoveListTable";
 import { CellSizeContext } from "@/helpers/context";
-import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
+import { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
 import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMoves";
 import loadBoard from "@/helpers/game/loadBoard";
 import whoWon from "@/helpers/game/whoWon";
 import useCellSize from "@/hooks/useCellSize";
-import { Board, BoardPosition, PieceType } from "@/types/game";
-import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
-
-interface PieceProps {
-  piece: string;
-  // x : [0, 6], y: [0, 8]
-  position: BoardPosition;
-  cellSize: number;
-}
-
-function Piece(props: PieceProps) {
-  return (
-    <Image
-      className={`absolute select-none`}
-      style={{ transform: `translate(${props.position.x * props.cellSize}px, ${props.position.y * props.cellSize}px)` }}
-      src={`/assets/pieces/${props.piece}.svg`}
-      alt="piece"
-      draggable={false}
-      width={props.cellSize}
-      height={props.cellSize}
-    />
-  );
-}
-
-function checkIfPieceWillMove(
-  x: number,
-  y: number,
-  board: Board,
-  pieces: PieceType[],
-  piece: PieceType,
-  activeCell?: BoardPosition
-) {
-  let willMove = false;
-  if (activeCell) {
-    const possibleMoves = getPosibleMoves(board, pieces, piece, activeCell);
-
-    for (let possibleMove of possibleMoves) {
-      if (possibleMove.x == x && possibleMove.y == y) {
-        willMove = true;
-      }
-    }
-  }
-
-  return willMove
-}
-
-function getPieceByPosition(
-  pieces: PieceType[],
-  activeCell: BoardPosition
-): {
-  piece: PieceType,
-  pieceIndex: number
-} {
-  const pieceIndex = pieces.findIndex(piece => piece.position.x == activeCell.x && piece.position.y == activeCell.y);
-  const piece = pieces[pieceIndex];
-  return { piece, pieceIndex };
-}
-
-interface MoveListTableProps {
-  board: Board,
-  moveList: string[][]
-}
-
-interface MoveProps {
-  piece?: string;
-  square?: string;
-}
-
-function Move(props: MoveProps) {
-  return (
-    <div className="flex">
-      {props.piece && 
-        <Image
-          className={`select-none fill-transparent scale-110`}
-          src={`/assets/pieces/${props.piece}.svg`}
-          alt="piece"
-          draggable={false}
-          width={40}
-          height={40}
-        />}
-      {props.square &&
-        <span className="-translate-x-[4px] translate-y-[6px]">{props.square}</span>}
-    </div>
-  );
-}
-
-function MoveListTable({ board, moveList }: MoveListTableProps) {
-  const { cellSize } = useCellSize(board, 100);
-  const moveListDummy = useRef<HTMLTableRowElement>(null);
-
-  useEffect(() => {
-    setTimeout(() => moveListDummy.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), 0);
-  }, [moveList]);
-
-  return (
-      <div
-        className="my-auto ml-4 text-xl"
-        style={{ height: cellSize * 9 }}
-      >
-        <div
-          className="bg-neutral-700 overflow-y-scroll"
-          style={{ width: cellSize * 6, height: cellSize * 6.6, marginTop: cellSize * 1.2 }}
-        >
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="p-1 pl-4"></th>
-                <th className="p-1 text-left text-secondary-500">Blue</th>
-                <th className="p-1 text-left text-error-500">Red</th>
-              </tr>
-            </thead>
-            <tbody>
-              {moveList
-                .map((row, i) => <tr key={i} className="w-fit odd:bg-neutral-800">
-                  <td className="pl-4">{i + 1}.</td>
-                  <td>
-                    <Move piece={"N" + row[0][0]} square={row[0].slice(1)}></Move>
-                  </td>
-                  <td>
-                    <Move piece={row[1] ? "N" + row[1][0] : undefined} square={row[1] ? row[1].slice(1) : undefined}></Move>
-                  </td>
-                </tr>)}
-              <tr ref={moveListDummy} tabIndex={-1}></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-  );
-}
+import { Board, BoardPosition } from "@/types/game";
+import { useState, useRef } from "react";
+import checkIfPieceWillMove from "@/helpers/game/checkIfPieceWillMove";
+import getPieceByPosition from "@/helpers/game/getPieceByPosition";
+import CellTags from "@/components/game/CellTags";
+import isThereWater from "@/helpers/game/isThereWater";
 
 export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
@@ -238,68 +116,23 @@ export default function Page() {
           marginTop: margin.y / 2,
           marginBottom: margin.y / 2,
         }}>
-        {new Array(board.height).fill(null).map((_, y) => (
-          new Array(board.width).fill(null).map((_, x) => {
-            const isFirstRow = y === board.height - 1;
-            const isFirstColumn = x === 0;
-            return (
-              <div
-                key={`${x} - ${y}`}
-                className={`bg-primary-${getCellColor(x, y)}`}
-              >
-              {isFirstRow && (
-                  <span
-                    className="absolute text-white font-semibold z-10"
-                    style={{transform: `translate(${cellSize - 16}px, ${cellSize - 20}px)`}}
-                  >
-                      {String.fromCharCode(65 + x)}
-                  </span>
-                  )}
-              {isFirstColumn && (
-                <span
-                  className="absolute text-white font-semibold z-10"
-                  style={{transform: `translate(4px, 2px)`}}
-                >
-                  {board.height - y}
-                </span>
-              )}
-            </div>)
-          })
-        ))}
-        {board.objects.traps.map(trap =>
-          <Trap
-            position={trap.position}
-            color={trap.color}
-            key={`${trap.position.x}-${trap.position.y}`}
-          />
-        )}
 
-        {board.objects.ends.map(end =>
-          <End
-            position={end.position}
-            color={end.color}
-            key={`${end.position.x}-${end.position.y}`}
-          />
-        )}
-
-        {board.objects.water.map(water =>
-          <Water
-            position={water.position}
-            key={`${water.position.x}-${water.position.y}`}
-          />
-        )}
-
-        {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} cellSize={cellSize} />)}
+        <CellTags board={board} cellSize={cellSize} />
+        <Traps board={board} />
+        <Ends board={board} />
+        <Waters board={board} />
 
         {activeCell &&
           <div
-            className={`absolute ${getActiveCellColor(activeCell.x, activeCell.y)}`}
+            className={`absolute bg-${isThereWater(board, activeCell.x, activeCell.y) ? "secondary" : "primary"}-${getActiveCellColor(activeCell.x, activeCell.y)}`}
             style={{
               transform: `translate(${activeCell.x * cellSize}px, ${activeCell.y * cellSize}px)`,
               width: cellSize,
               height: cellSize
             }}
           ></div>}
+
+        <Pieces board={board} cellSize={cellSize} />
 
         {board.pieces && activeCell &&
           getPosibleMoves(

@@ -1,9 +1,9 @@
-import { BoardPosition } from "@/types/game";
+import { Board, BoardPosition } from "@/types/game";
 import getCellColor from "@/helpers/game/getCellColor";
 import { useContext } from "react";
 import { CellSizeContext } from "@/helpers/context";
 
-export default function Water(props: { position: BoardPosition }) {
+function Water(props: { position: BoardPosition }) {
   const cellSize = useContext(CellSizeContext);
 
   return (
@@ -18,3 +18,15 @@ export default function Water(props: { position: BoardPosition }) {
     ></div>
   )
 }
+
+export default function Waters({ board }: { board: Board }) {
+  return <>
+    {board.objects.water.map(water =>
+      <Water
+        position={water.position}
+        key={`${water.position.x}-${water.position.y}`}
+      />
+    )}
+  </>;
+}
+

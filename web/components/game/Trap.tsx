@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Image from "next/image";
-import { BoardPosition, PieceColor } from "@/types/game";
+import { Board, BoardPosition, PieceColor } from "@/types/game";
 import { CellSizeContext } from "@/helpers/context";
 
 interface TrapProps {
@@ -8,7 +8,7 @@ interface TrapProps {
   color: PieceColor | null;
 }
 
-export default function Trap(props: TrapProps) {
+function Trap(props: TrapProps) {
   const cellSize = useContext(CellSizeContext);
 
   return (
@@ -31,3 +31,20 @@ export default function Trap(props: TrapProps) {
     </div>
   );
 }
+
+interface TrapsProps {
+  board: Board;
+}
+
+export default function Traps({ board }: TrapsProps) {
+  return <>
+    {board.objects.traps.map(trap =>
+      <Trap
+        position={trap.position}
+        color={trap.color}
+        key={`${trap.position.x}-${trap.position.y}`}
+      />
+    )}
+  </>
+}
+
