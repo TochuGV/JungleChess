@@ -7,7 +7,7 @@ const Footer: FC = () => {
     <footer>
       <hr />
       <div>
-        <p>Jungle Chess &#169; 2024</p>
+        <p>Jungle Chess &#169; 2025</p>
         <Link href="https://discord.gg/bJbRaCrJ3x" target="_blank" rel="noopener noreferrer">
           <i className="fa-brands fa-discord text-[#5865F2] text-2xl" />
         </Link>
