@@ -1,79 +1,37 @@
 "use client";
-import End from "@/components/game/End";
-import Trap from "@/components/game/Trap";
-import Water from "@/components/game/Water";
-import getCellColor, { getActiveCellColor } from "@/helpers/game/getCellColor";
+import Ends from "@/components/game/End";
+import Modal from "@/components/game/Modal";
+import Traps from "@/components/game/Trap";
+import Waters from "@/components/game/Water";
+import Pieces from "@/components/game/Piece";
+import MoveListTable from "@/components/game/MoveListTable";
+import { CellSizeContext } from "@/helpers/context";
+import { getActiveCellColor } from "@/helpers/game/getCellColor";
 import getPieceSource from "@/helpers/game/getPieceSource";
 import getPosibleMoves, { getEndInPosition } from "@/helpers/game/getPosibleMoves";
 import loadBoard from "@/helpers/game/loadBoard";
-import { Board, BoardPosition, PieceType } from "@/types/game";
-import Image from "next/image";
-import { useRef, useState } from "react";
-
-interface PieceProps {
-  piece: string;
-  // x : [0, 6], y: [0, 8]
-  position: BoardPosition;
-}
-
-function Piece(props: PieceProps) {
-  return (
-    <Image
-      className={`absolute`}
-      style={{ transform: `translate(${props.position.x * 48}px, ${props.position.y * 48}px)` }}
-      src={`/assets/pieces/${props.piece}.svg`}
-      alt="piece"
-      draggable={false}
-      width={48}
-      height={48}
-    />
-  );
-}
-
-function checkIfPieceWillMove(
-  x: number,
-  y: number,
-  board: Board,
-  pieces: PieceType[],
-  piece: PieceType,
-  activeCell?: BoardPosition
-) {
-  let willMove = false;
-  if (activeCell) {
-    const possibleMoves = getPosibleMoves(board, pieces, piece, activeCell);
-
-    for (let possibleMove of possibleMoves) {
-      if (possibleMove.x == x && possibleMove.y == y) {
-        willMove = true;
-      }
-    }
-  }
-
-  return willMove
-}
-
-function getPieceByPosition(
-  pieces: PieceType[],
-  activeCell: BoardPosition
-): {
-  piece: PieceType,
-  pieceIndex: number
-} {
-  const pieceIndex = pieces.findIndex(piece => piece.position.x == activeCell.x && piece.position.y == activeCell.y);
-  const piece = pieces[pieceIndex];
-  return { piece, pieceIndex };
-}
+import whoWon from "@/helpers/game/whoWon";
+import useCellSize from "@/hooks/useCellSize";
+import { Board, BoardPosition } from "@/types/game";
+import { useState, useRef } from "react";
+import checkIfPieceWillMove from "@/helpers/game/checkIfPieceWillMove";
+import getPieceByPosition from "@/helpers/game/getPieceByPosition";
+import CellTags from "@/components/game/CellTags";
+import isThereWater from "@/helpers/game/isThereWater";
 
 export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
   const [activeCell, setActiveCell] = useState<BoardPosition | undefined>();
   const boardRef = useRef<any>();
+  const { cellSize, margin } = useCellSize(board, 100);
+  const [showEndModal, setShowEndModal] = useState<boolean>(false);
+  const [moveList, setMoveList] = useState<string[][]>([]);
 
   const handleClick = (event: any) => {
     if (!board.pieces || board.game_ended) return;
     const boardElement = boardRef.current?.getBoundingClientRect();
-    const x = Math.floor((event.clientX - boardElement.left) / 48);
-    const y = Math.floor((event.clientY - boardElement.top) / 48);
+    const x = Math.floor((event.clientX - boardElement.left) / cellSize);
+    const y = Math.floor((event.clientY - boardElement.top) / cellSize);
 
     if (x != -1 && y != -1) {
       let hasMoved = false;
@@ -92,9 +50,20 @@ export default function Page() {
           if (end && end.color != piece.color) {
             console.log("Me parece que alguien gano");
             gameEnded = true;
+            setShowEndModal(true);
           }
 
-          // move a piece
+          // update move list
+          const formattedMove = getPieceSource(piece)[1] + (pieceToEatIndex != -1 ? "x" : "") + String.fromCharCode(x + 97) + (board.height - y).toString() + (gameEnded ? "#" : "");
+          if (moveList.length == 0 || moveList[moveList.length - 1].length == 2) {
+            setMoveList([...moveList, [formattedMove]])
+          } else {
+            setMoveList([
+              ...moveList.slice(0, moveList.length - 1),
+              [moveList[moveList.length - 1][0], formattedMove]
+            ]);
+          }
+
           setBoard(prev => ({
             ...prev,
             pieces: prev.pieces.map((p, idx) => idx == pieceIndex ? { ...piece, position: { x, y } } : p)
@@ -109,7 +78,6 @@ export default function Page() {
       }
 
       const hasNoMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
-
       let pieceSelected = false;
       if (currentPiece != undefined) {
         const isPiecesTurn = currentPiece.color == board.turns[board.turn];
@@ -128,59 +96,70 @@ export default function Page() {
     }
   }
 
+  const resetGame = () => {
+    setBoard(loadBoard());
+    setActiveCell(undefined);
+    setShowEndModal(false);
+    setMoveList([]);
+  }
+
   return (
-    <div className="m-auto my-8 w-fit grid grid-cols-7" onMouseDown={handleClick} ref={boardRef}>
-      {new Array(board.height).fill(null).map((_, y) => (
-        new Array(board.width).fill(null).map((_, x) => (
-          <div key={x + y} className={`w-12 h-12 bg-primary-${getCellColor(x, y)}`}></div>
-        ))
-      ))}
+    <CellSizeContext.Provider value={cellSize}>
+    <div className="flex m-auto w-fit">
+      <div
+        className="grid grid-cols-7"
+        onMouseDown={handleClick}
+        ref={boardRef}
+        style={{
+          width: cellSize * board.width,
+          height: cellSize * board.height,
+          marginTop: margin.y / 2,
+          marginBottom: margin.y / 2,
+        }}>
 
-      {board.objects.traps.map(trap =>
-        <Trap
-          position={`translate-x-[${trap.position.x * 48}px] translate-y-[${trap.position.y * 48}px]`}
-          color={trap.color}
-          key={`${trap.position.x}-${trap.position.y}`}
-        />
-      )}
+        <CellTags board={board} cellSize={cellSize} />
+        <Traps board={board} />
+        <Ends board={board} />
+        <Waters board={board} />
 
-      {board.objects.ends.map(end =>
-        <End
-          position={`translate-x-[${end.position.x * 48}px] translate-y-[${end.position.y * 48}px]`}
-          color={end.color}
-          key={`${end.position.x}-${end.position.y}`}
-        />
-      )}
-
-      {board.objects.water.map(water =>
-        <Water position={water.position} />
-      )}
-
-      {board.pieces.map(piece => <Piece key={getPieceSource(piece)} piece={getPieceSource(piece)} position={piece.position} />)}
-
-      {activeCell &&
-        <div
-          className={`absolute w-12 h-12 ${getActiveCellColor(activeCell.x, activeCell.y)}`}
-          style={{ transform: `translate(${activeCell.x * 48}px, ${activeCell.y * 48}px)` }}
-        ></div>}
-
-      {board.pieces && activeCell &&
-        getPosibleMoves(
-          board,
-          board.pieces,
-          getPieceByPosition(board.pieces, activeCell).piece,
-          activeCell
-        ).map(position => (
+        {activeCell &&
           <div
-            key={`${position.x} ${position.y}`}
-            className={`absolute w-12 h-12 grid place-content-center z-20`}
-            style={{ transform: `translate(${position.x * 48}px, ${position.y * 48}px)` }}
-          >
-            <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
-          </div>
-        ))}
+            className={`absolute bg-${isThereWater(board, activeCell.x, activeCell.y) ? "secondary" : "primary"}-${getActiveCellColor(activeCell.x, activeCell.y)}`}
+            style={{
+              transform: `translate(${activeCell.x * cellSize}px, ${activeCell.y * cellSize}px)`,
+              width: cellSize,
+              height: cellSize
+            }}
+          ></div>}
+
+        <Pieces board={board} cellSize={cellSize} />
+
+        {board.pieces && activeCell &&
+          getPosibleMoves(
+            board,
+            board.pieces,
+            getPieceByPosition(board.pieces, activeCell).piece,
+            activeCell
+          ).map(position => (
+            <div
+              key={`${position.x} ${position.y}`}
+              className={`absolute grid place-content-center z-20`}
+              style={{
+                transform: `translate(${position.x * cellSize}px, ${position.y * cellSize}px)`,
+                width: cellSize,
+                height: cellSize
+              }}
+            >
+              <div className="w-3 h-3 rounded-full bg-[rgba(0,0,0,0.5)]"></div>
+            </div>
+          ))}
+      </div>
+      <MoveListTable {...{board, moveList}} />
     </div>
+    <Modal show={showEndModal} hide={() => setShowEndModal(false)} className="px-8 py-4 rounded-sm">
+      <p className="text-xl mb-2">{whoWon(board)} won!</p>
+      <button onClick={resetGame} className="bg-primary-500 text-black px-6 py-2 rounded-sm">Play Again</button>
+    </Modal>
+    </CellSizeContext.Provider>
   );
 }
-
-//  translate-x-[0px] translate-x-[48px] translate-x-[96px] translate-x-[144px] translate-x-[192px] translate-x-[240px] translate-x-[288px] translate-x-[336px] translate-x-[384px] translate-x-[432px] translate-y-[0px] translate-y-[48px] translate-y-[96px] translate-y-[144px] translate-y-[192px] translate-y-[240px] translate-y-[288px] translate-y-[336px] translate-y-[384px] translate-y-[432px]

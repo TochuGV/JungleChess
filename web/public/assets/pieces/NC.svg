@@ -3,12 +3,8 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 200 200" style="enable-background:new 0 0 200 200;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#3EC0F0;stroke:#35398E;stroke-width:3;stroke-miterlimit:10;}
-	.st1{fill:none;stroke:#35398E;stroke-width:3;stroke-miterlimit:10;}
+	.st1{fill:none;stroke:white;stroke-width:5;stroke-miterlimit:10;}
 </style>
-<g id="Capa_2">
-	<circle class="st0" cx="100" cy="100" r="87.5"/>
-</g>
 <g id="Capa_1">
 	<g>
 		<g>
@@ -24,7 +20,6 @@
 			<path class="st1" d="M121.73,74.22c16.8-12.03,16.57-7.09,16.57-7.09l0,3.04"/>
 			<path class="st1" d="M112.41,122.43c0,0,9.47-1.88,14.15,4.24"/>
 			<path class="st1" d="M112.41,115.84c16-1.18,18.82,5,18.82,5"/>
-			<circle class="st1" cx="100" cy="100" r="75"/>
 		</g>
 	</g>
 	<g>
@@ -41,7 +36,6 @@
 			<path class="st1" d="M78.27,74.22c-16.8-12.03-16.57-7.09-16.57-7.09l0,3.04"/>
 			<path class="st1" d="M87.59,122.43c0,0-9.47-1.88-14.15,4.24"/>
 			<path class="st1" d="M87.59,115.84c-16-1.18-18.82,5-18.82,5"/>
-			<circle class="st1" cx="100" cy="100" r="75"/>
 		</g>
 	</g>
 </g>

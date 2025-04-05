@@ -8,7 +8,7 @@ These are the dependencies required to start working:
 
 - Git (Any version)
 - NodeJS (Latest version)
-- Microsoft SQL Server (Any version)
+- Microsoft SQL Server (Any version - Developer recommended)
   - Create the server with SQL Server Authentication and set the user and password to anything, preferably to root and root
 
 ## Picking a ticket
