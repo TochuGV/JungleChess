@@ -1,4 +1,4 @@
-import { getAllUsers } from "@/axios/userRequests"
+//import { getAllUsers } from "@/axios/userRequests"
 import Link from "next/link";
 
 export default async function Home() {

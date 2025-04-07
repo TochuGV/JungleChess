@@ -48,7 +48,6 @@ export default function Page() {
           const end = getEndInPosition(board, x, y);
           let gameEnded = false;
           if (end && end.color != piece.color) {
-            console.log("Me parece que alguien gano");
             gameEnded = true;
             setShowEndModal(true);
           }
