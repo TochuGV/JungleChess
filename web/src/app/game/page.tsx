@@ -18,6 +18,7 @@ import checkIfPieceWillMove from "@/helpers/game/checkIfPieceWillMove";
 import getPieceByPosition from "@/helpers/game/getPieceByPosition";
 import CellTags from "@/components/game/CellTags";
 import isThereWater from "@/helpers/game/isThereWater";
+import { getCellPos, validCellPos } from "@/helpers/game/boardHelpers";
 
 export default function Page() {
   const [board, setBoard] = useState<Board>(loadBoard());
@@ -30,14 +31,11 @@ export default function Page() {
   const handleClick = (event: any) => {
     if (!board.pieces || board.game_ended) return;
     const boardElement = boardRef.current?.getBoundingClientRect();
-    const x = Math.floor((event.clientX - boardElement.left) / cellSize);
-    const y = Math.floor((event.clientY - boardElement.top) / cellSize);
+    const { x, y } = getCellPos(event, boardRef, cellSize);
 
-    if (x != -1 && y != -1) {
+    if (validCellPos(x, y)) {
       let hasMoved = false;
       // The piece that is in the cell that will be eaten
-      const currentPiece = getPieceByPosition(board.pieces, { x, y }).piece;
-
       if (activeCell) {
         // The piece that will move
         const activeCellPiece = getPieceByPosition(board.pieces, activeCell).piece;
@@ -75,13 +73,26 @@ export default function Page() {
           hasMoved = true;
         }
       }
+    }
+  }
 
-      const hasNoMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
+  const handleMouseDown = (event: any) => {
+    if(activeCell != undefined) {
+      handleClick(event);
+    }
+
+    if (!board.pieces || board.game_ended) return;
+    const { x, y } = getCellPos(event, boardRef, cellSize);
+
+    if (validCellPos(x, y)) {
+      // The piece that is in the cell that will be eaten
+      const currentPiece = getPieceByPosition(board.pieces, { x, y }).piece;
+      const hasMoves = getPosibleMoves(board, board.pieces, currentPiece, { x, y }).length != 0;
       let pieceSelected = false;
       if (currentPiece != undefined) {
         const isPiecesTurn = currentPiece.color == board.turns[board.turn];
 
-        if (!hasMoved && hasNoMoves && isPiecesTurn) {
+        if (hasMoves && isPiecesTurn) {
           // select a piece
           setActiveCell({ x, y });
           pieceSelected = true;
@@ -107,7 +118,8 @@ export default function Page() {
     <div className="flex m-auto w-fit">
       <div
         className="grid grid-cols-7"
-        onMouseDown={handleClick}
+        onMouseUp={handleClick}
+        onMouseDown={handleMouseDown}
         ref={boardRef}
         style={{
           width: cellSize * board.width,
@@ -131,7 +143,7 @@ export default function Page() {
             }}
           ></div>}
 
-        <Pieces board={board} cellSize={cellSize} />
+        <Pieces board={board} cellSize={cellSize} activeCell={activeCell} />
 
         {board.pieces && activeCell &&
           getPosibleMoves(
